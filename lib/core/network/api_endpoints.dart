@@ -6,11 +6,11 @@ class ApiEndpoint {
   const ApiEndpoint._();
 
   /// Base URL selection based on environment
-  static const String _baseUrlProd = 'http://86.107.199.109/';
-  static const String _baseUrlDev = 'http://86.107.199.109/';
+  static const String _baseUrlProd = 'https://api.pecs.qys.kz/';
+  static const String _baseUrlDev = 'https://api.pecs.qys.kz/';
 
-  static const String _baseUrlProxyProd = 'http://86.107.199.109/';
-  static const String _baseUrlProxyDev = 'http://86.107.199.109/';
+  static const String _baseUrlProxyProd = 'https://api.pecs.qys.kz/';
+  static const String _baseUrlProxyDev = 'https://api.pecs.qys.kz/';
 
   static String get baseUrl => EnvironmentConfig.isProduction ? _baseUrlProd : _baseUrlDev;
   static String get baseUrlProxy => EnvironmentConfig.isProduction ? _baseUrlProxyProd : _baseUrlProxyDev;

@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pecs_new_arch/features/home/presentation/screens/home_screen.dart';
 import 'package:pecs_new_arch/features/login/data/models/login_request_model.dart';
 import 'package:pecs_new_arch/features/login/presentation/bloc/login_bloc.dart';
 
@@ -64,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: BlocConsumer<LoginBloc, LoginState>(
                         listener: (context, state) {
                           if (state is LoginSuccess) {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => SizedBox()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
                           } else if (state is LoginFailure) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Error: ${state.message.message}")),

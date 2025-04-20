@@ -62,224 +62,227 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       create: (context) => RegistrationBloc(), // Provide the SignUpBloc
       child: Scaffold(
         backgroundColor: const Color.fromRGBO(246, 250, 245, 1),
-        body: SafeArea(
-          child: BlocConsumer<RegistrationBloc, RegistrationState>(
-            listener: (context, state) {
-              if (state is RegistrationLoading) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) => const Center(child: CircularProgressIndicator()),
-                );
-              } else if (state is RegistrationSuccess) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Регистрация прошла успешно!')),
-                );
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const StartPage()));
-              } else if (state is RegistrationFailure) {
-                Navigator.of(context).pop(); // Remove loading dialog
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message.message)),
-                );
-              }
-            },
-            builder: (context, state) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 80,
-                        width: 140,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(width: 2),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Image.asset(
-                            'assets/jpg/logo.jpg',
-                            height: 100,
-                            width: 120,
-                            fit: BoxFit.cover,
+        body: SingleChildScrollView(
+          child: SafeArea(
+            child: BlocConsumer<RegistrationBloc, RegistrationState>(
+              listener: (context, state) {
+                if (state is RegistrationLoading) {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => const Center(child: CircularProgressIndicator()),
+                  );
+                } else if (state is RegistrationSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Регистрация прошла успешно!')),
+                  );
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const StartPage()));
+                } else if (state is RegistrationFailure) {
+                  Navigator.of(context).pop(); // Remove loading dialog
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(state.message.message)),
+                  );
+                }
+              },
+              builder: (context, state) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 80,
+                          width: 140,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(width: 2),
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        height: 550,
-                        width: 450,
-                        decoration: BoxDecoration(
-                          color: const Color.fromRGBO(255, 255, 255, 1),
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(
-                            color: const Color.fromRGBO(102, 102, 102, 1),
-                            width: 2,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 10),
-                            const Text(
-                              'Регистрация',
-                              style: TextStyle(fontSize: 24, fontFamily: 'Montserrat'),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: Image.asset(
+                              'assets/jpg/logo.jpg',
+                              height: 100,
+                              width: 120,
+                              fit: BoxFit.cover,
                             ),
-                            const SizedBox(height: 10),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
-                              child: Column(
-                                children: [
-                                  TextField(
-                                    controller: _firstnameController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Имя',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      errorText: _firstnameError,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  TextField(
-                                    controller: _surnameController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Фамилия',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      errorText: _surnameError,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  TextField(
-                                    controller: _usernameController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Имя пользователя',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      errorText: _usernameError,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  TextField(
-                                    controller: _emailController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Электронный адрес',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      errorText: _emailError,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-
-                                  /// Dropdown for Role Selection
-                                  DropdownButtonFormField<String>(
-                                    value: _selectedRole,
-                                    decoration: InputDecoration(
-                                      hintText: 'Выберите роль',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      errorText: _roleError,
-                                    ),
-                                    items: const [
-                                      DropdownMenuItem(
-                                        value: 'cg_role',
-                                        child: Text('Опекун'),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: 'cr_role',
-                                        child: Text('Пациент'),
-                                      ),
-                                    ],
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _selectedRole = value;
-                                      });
-                                    },
-                                  ),
-
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: TextField(
-                                          controller: _passwordController,
-                                          decoration: InputDecoration(
-                                            hintText: 'Пароль',
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            errorText: _passwordError,
-                                          ),
-                                          obscureText: !_showPasswords,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: TextField(
-                                          controller: _againPasswordController,
-                                          decoration: InputDecoration(
-                                            hintText: 'Повторите пароль',
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            errorText: _againPasswordError,
-                                          ),
-                                          obscureText: !_showPasswords,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Checkbox(
-                                        value: _showPasswords,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _showPasswords = value!;
-                                          });
-                                        },
-                                      ),
-                                      const Text("Показать"),
-                                    ],
-                                  ),
-                                ],
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          height: 580,
+                          width: 450,
+                          decoration: BoxDecoration(
+                            color: const Color.fromRGBO(255, 255, 255, 1),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                              color: const Color.fromRGBO(102, 102, 102, 1),
+                              width: 2,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 10),
+                              const Text(
+                                'Регистрация',
+                                style: TextStyle(fontSize: 24, fontFamily: 'Montserrat'),
                               ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                _validateFields();
-                                if (_firstnameError == null &&
-                                    _surnameError == null &&
-                                    _usernameError == null &&
-                                    _emailError == null &&
-                                    _passwordError == null) {
-                                  context.read<RegistrationBloc>().add(RegisterUser(
-                                        user: SignupRequestModel(
-                                            username: _usernameController.text,
-                                            password: _passwordController.text,
-                                            email: _emailController.text,
-                                            firstName: _firstnameController.text,
-                                            lastName: _surnameController.text,
-                                            role: _selectedRole!),
-                                      ));
-                                }
-                              },
-                              child: const Text('Создать аккаунт'),
-                            ),
-                          ],
+                              const SizedBox(height: 10),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: Column(
+                                  children: [
+                                    TextField(
+                                      controller: _firstnameController,
+                                      decoration: InputDecoration(
+                                        hintText: 'Имя',
+                                        
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        errorText: _firstnameError,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    TextField(
+                                      controller: _surnameController,
+                                      decoration: InputDecoration(
+                                        hintText: 'Фамилия',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        errorText: _surnameError,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    TextField(
+                                      controller: _usernameController,
+                                      decoration: InputDecoration(
+                                        hintText: 'Имя пользователя',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        errorText: _usernameError,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    TextField(
+                                      controller: _emailController,
+                                      decoration: InputDecoration(
+                                        hintText: 'Электронный адрес',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        errorText: _emailError,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+
+                                    /// Dropdown for Role Selection
+                                    DropdownButtonFormField<String>(
+                                      value: _selectedRole,
+                                      decoration: InputDecoration(
+                                        hintText: 'Выберите роль',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        errorText: _roleError,
+                                      ),
+                                      items: const [
+                                        DropdownMenuItem(
+                                          value: 'cg_role',
+                                          child: Text('Опекун'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'cr_role',
+                                          child: Text('Пациент'),
+                                        ),
+                                      ],
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedRole = value;
+                                        });
+                                      },
+                                    ),
+
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextField(
+                                            controller: _passwordController,
+                                            decoration: InputDecoration(
+                                              hintText: 'Пароль',
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              errorText: _passwordError,
+                                            ),
+                                            obscureText: !_showPasswords,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: TextField(
+                                            controller: _againPasswordController,
+                                            decoration: InputDecoration(
+                                              hintText: 'Повторите пароль',
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              errorText: _againPasswordError,
+                                            ),
+                                            obscureText: !_showPasswords,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Checkbox(
+                                          value: _showPasswords,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _showPasswords = value!;
+                                            });
+                                          },
+                                        ),
+                                        const Text("Показать"),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  _validateFields();
+                                  if (_firstnameError == null &&
+                                      _surnameError == null &&
+                                      _usernameError == null &&
+                                      _emailError == null &&
+                                      _passwordError == null) {
+                                    context.read<RegistrationBloc>().add(RegisterUser(
+                                          user: SignupRequestModel(
+                                              username: _usernameController.text,
+                                              password: _passwordController.text,
+                                              email: _emailController.text,
+                                              firstName: _firstnameController.text,
+                                              lastName: _surnameController.text,
+                                              role: _selectedRole!),
+                                        ));
+                                  }
+                                },
+                                child: const Text('Создать аккаунт'),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),

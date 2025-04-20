@@ -65,11 +65,12 @@ class _CategoriesState extends State<Categories> {
               ],
             );
           } else if (state is CategoriesLoaded) {
-            final List<CateoriesListModel>? filteredCategories = _searchQuery.isEmpty
+final List<CateoriesListModel>? filteredCategories = _searchQuery.isEmpty
                 ? state.categories
                 : state.categories
-                    ?.where((category) => category.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+                    ?.where((category) => (category.name ?? '').toLowerCase().contains(_searchQuery.toLowerCase()))
                     .toList();
+
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -154,7 +155,7 @@ class _CategoriesState extends State<Categories> {
 
                         return CategoryCard(
                           title: category?.name ?? 'Category ${index + 1}',
-                          imageUrl: category?.imageUrl ?? 'https://via.placeholder.com/150',
+                          imageUrl: category?.imageUrl ?? '',
                           onTap: () {
                             Navigator.push(
                                 context, MaterialPageRoute(builder: (context) => InnerCatolog(id: category?.id ?? -1)));

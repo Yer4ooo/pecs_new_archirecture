@@ -9,6 +9,9 @@ import 'package:get_it/get_it.dart';
 import 'package:pecs_new_arch/core/theme/app_theme.dart';
 import 'package:pecs_new_arch/core/utils/key_value_storage_service.dart';
 import 'package:pecs_new_arch/features/home/presentation/screens/home_screen.dart';
+import 'package:pecs_new_arch/features/library/presentation/bloc/library_bloc.dart';
+import 'package:pecs_new_arch/features/login/presentation/bloc/login_bloc.dart';
+import 'package:pecs_new_arch/features/registration/presentation/bloc/registration_bloc.dart';
 import 'package:pecs_new_arch/features/start/presentation/start_page.dart';
 import 'package:pecs_new_arch/injection_container.dart';
 
@@ -21,6 +24,12 @@ Future<void> initApp() async {
   runApp(
     MultiBlocProvider(
       providers: [
+        BlocProvider(create: (_) => sl<RegistrationBloc>()),
+        BlocProvider(create: (_) => sl<LoginBloc>()),
+        BlocProvider(create: (_) => sl<LibraryBloc>()),
+
+
+
 
       ],
       child: EasyLocalization(

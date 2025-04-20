@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pecs_new_arch/features/about/presentation/screens/about_us.dart';
 import 'package:pecs_new_arch/features/home/presentation/screens/widgets/user_dropdown.dart';
+import 'package:pecs_new_arch/features/library/presentation/screens/categories.dart';
 
 class HomeTopWidget extends StatefulWidget {
   const HomeTopWidget({super.key});
@@ -26,12 +27,12 @@ class _HomeTopWidgetState extends State<HomeTopWidget> {
                   'assets/jpg/logo.jpg', // Your logo path
                   height: 150, // Adjust size for tablet
                 ),
-                _buildNavItem(context, 'Главная', SizedBox()),
-                _buildNavItem(context, 'Наша платформа', SizedBox()),
+                _buildNavItem(context, 'Главная', AboutUs()),
+                _buildNavItem(context, 'Наша платформа', AboutUs()),
                 _buildNavItem(context, 'О нас', AboutUs()),
-                _buildNavItem(context, 'Отзывы', SizedBox()),
-                _buildNavItem(context, 'Библиотека', SizedBox()),
-                _buildNavItem(context, 'Контакты', SizedBox()),
+                _buildNavItem(context, 'Отзывы', AboutUs()),
+                _buildNavItem(context, 'Библиотека', Categories()),
+                _buildNavItem(context, 'Контакты', AboutUs()),
                 Expanded(
                     child: UserDropdown(
                   username: 'username',

@@ -15,10 +15,10 @@ class RegistrationRepositoryImpl implements RegistrationRepository {
   Future<DataState> register({required SignupRequestModel userModel}) async {
     try {
       dynamic data = await _registrationApiService.registerUser(userModel);
-      if (data != null) {
+      if (data == null) {
         return DataSuccess(data);
       } else {
-        return DataFailed(CustomException(message: data['detail']['message']));
+        return DataFailed(CustomException(message: data['message']));
       }
     } on CustomException catch (e) {
       return DataFailed(e);

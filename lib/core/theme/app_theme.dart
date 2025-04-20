@@ -72,7 +72,7 @@ ThemeData APP_THEME = ThemeData(
       fontWeight: FontWeight.w500,
       fontStyle: FontStyle.normal,
       fontSize: 14.sp,
-      color: Colors.white70,
+      color: Colors.grey,
       letterSpacing: 0.24,
     ),
   ),

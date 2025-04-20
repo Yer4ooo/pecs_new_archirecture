@@ -24,7 +24,7 @@ class ApiInterceptor extends Interceptor {
     final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
     if (token != null) {
       options.headers.addAll(
-        <String, Object?>{'Authorization': 'Token $token'},
+        <String, Object?>{'Authorization': 'Bearer $token'},
       );
     }
 

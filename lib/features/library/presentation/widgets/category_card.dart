@@ -31,13 +31,43 @@ class CategoryCard extends StatelessWidget {
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
                 ),
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
+                child: (imageUrl == null || imageUrl.isEmpty)
+                    ? Container(
+                        color: Colors.grey[300], // Light gray background
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'Нет изображения',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    : Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[300],
+                            alignment: Alignment.center,
+                            child: const Text(
+                              'Не удалось загрузить\nизображение',
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        },
+                      ),
               ),
             ),
+
             // Title Section (20% of the card)
             Expanded(
               flex: 2,
