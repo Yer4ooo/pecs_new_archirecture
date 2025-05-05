@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:pecs_new_arch/core/utils/service_locator.dart';
+import 'package:pecs_new_arch/features/board/logic/bloc/board_bloc.dart';
 import 'package:pecs_new_arch/features/library/data/datasource/library_api_service.dart';
 import 'package:pecs_new_arch/features/library/data/repository/library_repo_impl.dart';
 import 'package:pecs_new_arch/features/library/domain/repository/library_repository.dart';
@@ -44,6 +45,9 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<CreateImageUsecase>(CreateImageUsecase(sl()));
   sl.registerSingleton<GetCategoriesUsecase>(GetCategoriesUsecase(sl()));
   sl.registerSingleton<GetCategoryImagesUsecase>(GetCategoryImagesUsecase(sl()));
+
+  //board
+  sl.registerFactory<BoardBloc>(() => BoardBloc());
 
 
 

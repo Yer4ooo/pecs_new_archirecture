@@ -13,7 +13,7 @@ class LibraryApiService {
 
   Future<List<CateoriesListModel>?> getCategories() => _networkClient.getData<List<CateoriesListModel>>(
         endpoint: 'categories',
-        parser: (response) =>CateoriesListModel.fromList(response['categories'])
+        parser: (response) =>CateoriesListModel.fromList(response['object_list'])
       );
        Future<List<CateoriesImagesListModel>?> getCategoryImagesbyId({required int? id}) => _networkClient.getData<List<CateoriesImagesListModel>>(
        

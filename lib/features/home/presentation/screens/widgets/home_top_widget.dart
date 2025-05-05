@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pecs_new_arch/features/about/presentation/screens/about_us.dart';
+import 'package:pecs_new_arch/features/board/screens/board.dart';
+import 'package:pecs_new_arch/features/board/screens/boards_screen.dart';
+import 'package:pecs_new_arch/features/home/presentation/screens/home_screen.dart';
 import 'package:pecs_new_arch/features/home/presentation/screens/widgets/user_dropdown.dart';
 import 'package:pecs_new_arch/features/library/presentation/screens/categories.dart';
 
@@ -27,10 +30,10 @@ class _HomeTopWidgetState extends State<HomeTopWidget> {
                   'assets/jpg/logo.jpg', // Your logo path
                   height: 150, // Adjust size for tablet
                 ),
-                _buildNavItem(context, 'Главная', AboutUs()),
+                _buildNavItem(context, 'Главная', HomeScreen()),
                 _buildNavItem(context, 'Наша платформа', AboutUs()),
                 _buildNavItem(context, 'О нас', AboutUs()),
-                _buildNavItem(context, 'Отзывы', AboutUs()),
+                _buildNavItem(context, 'Доска', BoardsScreen()),
                 _buildNavItem(context, 'Библиотека', Categories()),
                 _buildNavItem(context, 'Контакты', AboutUs()),
                 Expanded(

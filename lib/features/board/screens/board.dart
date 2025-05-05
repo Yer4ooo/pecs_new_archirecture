@@ -19,8 +19,8 @@ class BoardType {
 }
 class _BoardState extends State<Board> {
   List<BoardType> boards = [
-    BoardType('Item1', Color.fromRGBO(97, 148, 81, 1), [[], [], [], [], []], 3),
-    BoardType('Item2', Colors.blue, [[], [], [], [], []], 5),
+    BoardType('Доска 1', Color.fromRGBO(97, 148, 81, 1), [[], [], [], [], []], 3),
+    BoardType('Доска 2', Colors.blue, [[], [], [], [], []], 5),
   ];
   int curBoardId = 0;
   final List<Map<String, String>> _alternativeContainerItems = [];
@@ -96,32 +96,25 @@ class _BoardState extends State<Board> {
     },
     child: Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                height: 450,
-                color: boards[curBoardId].color,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: List.generate(
-                      boards[curBoardId].numOfRows, (index) =>
-                      _buildDragTarget(index)),
-                ),
-              ),
-              Stack(
-                children: [
-                  Container(
-                    height: 70,
+          body: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  height: 400,
+                  color: boards[curBoardId].color,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(boards[curBoardId].numOfRows, (index) => _buildDragTarget(index)),
                   ),
-                  Row(
-                      children: [...boards
-                          .asMap()
-                          .entries
-                          .map((entry) {
+                ),
+                Stack(
+                  children: [
+                    Container(
+                      height: 70,
+                    ),
+                    Row(children: [
+                      ...boards.asMap().entries.map((entry) {
                         int index = entry.key;
                         BoardType board = entry.value;
                         return InkWell(
@@ -139,10 +132,12 @@ class _BoardState extends State<Board> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Center(
-                                      child: Text(board.name,
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 16),
-                                        textAlign: TextAlign.center,),),
+                                      child: Text(
+                                        board.name,
+                                        style: TextStyle(color: Colors.white, fontSize: 16),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
                                     Align(
                                         alignment: Alignment.topRight,
                                         child: IconButton(
@@ -152,10 +147,11 @@ class _BoardState extends State<Board> {
                                               curBoardId = index;
                                               _onEditBoard();
                                             });
-                                          },))
-                                  ],),
-                              )
-                          ),
+                                          },
+                                        ))
+                                  ],
+                                ),
+                              )),
                           onTap: () {
                             setState(() {
                               curBoardId = index;
@@ -164,50 +160,48 @@ class _BoardState extends State<Board> {
                           },
                         );
                       }),
-                        Container(
-                          height: 50,
-                          width: 180,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade400,
-                            borderRadius: const BorderRadius.only(
-                              bottomRight: Radius.circular(16.0),
-                            ),
-                          ),
-                          child: Center(
-                            child: IconButton(
-                              onPressed: () {
-                                _onCreateNewBoard();
-                              },
-                              icon: const Icon(Icons.add, color: Colors.white),
-                            ),
+                      Container(
+                        height: 50,
+                        width: 180,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade400,
+                          borderRadius: const BorderRadius.only(
+                            bottomRight: Radius.circular(16.0),
                           ),
                         ),
-                      ]
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16, bottom: 5),
-                child: Container(
-                  color: Colors.grey,
-                  height: 200,
-                  child: _isMediaGridVisible
-                      ? Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      _buildHeader(),
-                      _selectedBubble != null
-                          ? _buildImageGrid(_selectedBubble!)
-                          : _showPecsExpandedBubbles
-                          ? _buildPecsExpandedBubbles()
-                          : _buildBubbles(),
-                    ],
-                  )
-                      : _buildAlternativeContainer(),
+                        child: Center(
+                          child: IconButton(
+                            onPressed: () {
+                              _onCreateNewBoard();
+                            },
+                            icon: const Icon(Icons.add, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ]),
+                  ],
                 ),
-              )
-            ],
-          ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16, bottom: 5),
+                  child: Container(
+                    color: Colors.grey,
+                    height: 200,
+                    child: _isMediaGridVisible
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              _buildHeader(),
+                              _selectedBubble != null
+                                  ? _buildImageGrid(_selectedBubble!)
+                                  : _showPecsExpandedBubbles
+                                      ? _buildPecsExpandedBubbles()
+                                      : _buildBubbles(),
+                            ],
+                          )
+                        : _buildAlternativeContainer(),
+                  ),
+                )
+              ],
         ),
       ),
     ));
@@ -697,15 +691,15 @@ class _BoardState extends State<Board> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: Center(child: Text("Create new board22", style: TextStyle(fontSize: 22))),
+              title: Center(child: Text("Создать новую доску", style: TextStyle(fontSize: 22))),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Align(
                       alignment: Alignment.topLeft,
-                      child: Text("Enter the name of the new board22:", style: TextStyle(fontSize: 20))),
+                      child: Text("Введи имя", style: TextStyle(fontSize: 20))),
                   TextField(
-                    decoration: InputDecoration(hintText: "untitled"),
+                    decoration: InputDecoration(hintText: "Без названия"),
                     onChanged: (text) {
                       dialogName = text;
                     },
@@ -713,7 +707,7 @@ class _BoardState extends State<Board> {
                   SizedBox(height: 50),
                   SizedBox(height: 200, child: buildColorPicker()),
                   SizedBox(height: 50),
-                  Text("Choose the number of columns you want", style: TextStyle(fontSize: 20)),
+                  Text("Веди количество строк", style: TextStyle(fontSize: 20)),
                   DropdownButton<int>(
                     items: List.generate(5, (index) {
                       int value = index + 1;
@@ -737,11 +731,11 @@ class _BoardState extends State<Board> {
                       parentContext.read<BoardBloc>().add(CreateBoard(name: dialogName));
                       setState(() {
                         boards.add(BoardType(dialogName, color, [[], [], [], [], []], dialogNumOfRows));
-                        name = 'untitled';
+                        name = 'Без названия';
                         color = Color.fromRGBO(97, 148, 81, 1);
                       });
                     },
-                    child: Text("Create"),
+                    child: Text("Создать"),
                   ),
                 )
               ],

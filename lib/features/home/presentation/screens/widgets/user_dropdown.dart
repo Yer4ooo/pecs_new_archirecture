@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pecs_new_arch/features/start/presentation/start_page.dart';
 
 
 class UserDropdown extends StatefulWidget {
@@ -45,7 +46,14 @@ class _UserDropdownState extends State<UserDropdown> {
                   context,
                   MaterialPageRoute(builder: (context) => SizedBox()),
                 );
-              }
+              }else if (selectedItem == 'Settings') {
+                // Navigate to settings page
+              } else if (selectedItem == 'Logout') {
+               Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StartPage()),
+                );
+              }                                  
               // Add other actions for 'Settings' and 'Logout' here
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[

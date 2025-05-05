@@ -13,7 +13,7 @@ class LoginApiService {
   Future<dynamic> login(LoginRequestModel? user) => _networkClient.postData<LoginResponseModel>(
         baseurl: AuthEndpoint.login.path,
         endpoint: 'login',
-        body: {'username': user?.username, 'password': user?.password},
+        body: {'identifier': user?.username, 'password': user?.password},
         parser: (response) {
           GetIt.I<KeyValueStorageService>().setUserData(loginResponseModelToJson(LoginResponseModel.fromJson(response)));
           GetIt.I<KeyValueStorageService>().setAccessToken(response['access']);

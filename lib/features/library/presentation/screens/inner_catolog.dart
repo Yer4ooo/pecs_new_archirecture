@@ -71,12 +71,18 @@ class _InnerCatologState extends State<InnerCatolog> {
             );
           } else if (state is CategoryImagesLoaded) {
             List<CateoriesImagesListModel>? filteredImages = state.images?.where((image) {
-              if (_showMyCards && !image.public) return false;
-              if (_searchQuery.isNotEmpty && !image.name.toLowerCase().contains(_searchQuery.toLowerCase())) {
+              // Check for null before using 'public'
+              if (_showMyCards && (image.public != true)) return false;
+
+              // Check if name is not null before using 'contains'
+              if (_searchQuery.isNotEmpty &&
+                  !(image.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false)) {
                 return false;
               }
+
               return true;
-            }).toList();
+}).toList(); // convert Iterable to List
+
             return SingleChildScrollView(
               child: Column(
                 children: [

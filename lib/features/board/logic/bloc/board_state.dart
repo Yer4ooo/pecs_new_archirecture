@@ -7,7 +7,7 @@ class BoardInitial extends BoardState {}
 class BoardLoading extends BoardState {}
 
 class BoardSuccess extends BoardState {
-  final BoardResponseModel boardData;
+  final BoardModel boardData;
 
   BoardSuccess({required this.boardData});
 }

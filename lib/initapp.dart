@@ -8,6 +8,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:get_it/get_it.dart';
 import 'package:pecs_new_arch/core/theme/app_theme.dart';
 import 'package:pecs_new_arch/core/utils/key_value_storage_service.dart';
+import 'package:pecs_new_arch/features/board/logic/bloc/board_bloc.dart';
 import 'package:pecs_new_arch/features/home/presentation/screens/home_screen.dart';
 import 'package:pecs_new_arch/features/library/presentation/bloc/library_bloc.dart';
 import 'package:pecs_new_arch/features/login/presentation/bloc/login_bloc.dart';
@@ -27,6 +28,7 @@ Future<void> initApp() async {
         BlocProvider(create: (_) => sl<RegistrationBloc>()),
         BlocProvider(create: (_) => sl<LoginBloc>()),
         BlocProvider(create: (_) => sl<LibraryBloc>()),
+        BlocProvider(create: (_) => sl<BoardBloc>()),
 
 
 
