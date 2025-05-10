@@ -9,3 +9,10 @@ class CreateBoard extends BoardEvent {
 
   CreateBoard({required this.name});
 }
+
+
+class PlayTTS extends BoardEvent {
+  final String text;
+
+  PlayTTS({required this.text});
+}

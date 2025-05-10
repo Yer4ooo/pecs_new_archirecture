@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:path_provider/path_provider.dart';
 import '../logic/bloc/board_bloc.dart';
 import '../widgets/bottom_board.dart';
 
@@ -280,6 +284,15 @@ class _BoardState extends State<Board> {
   }
 
   Widget _buildAlternativeContainer() {
+    final AudioPlayer _player = AudioPlayer();
+
+    Future<void> _playBytesAsAudio(List<int> bytes) async {
+      final tempDir = await getTemporaryDirectory();
+      final file = File('${tempDir.path}/tts_audio.mp3');
+      await file.writeAsBytes(bytes, flush: true);
+      await _player.setFilePath(file.path);
+      _player.play();
+    }
     return DragTarget<Map<String, String>>(
       onAccept: (data) {
         setState(() {
@@ -331,38 +344,61 @@ class _BoardState extends State<Board> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          icon: const Icon(
-                              Icons.play_arrow, color: Colors.white, size: 50),
-                          onPressed: () {
-                            print(_alternativeContainerItems);
-                            _onReturnIconTap();
-                          },
-                        ),
+                      BlocConsumer<BoardBloc, BoardState>(
+                        listener: (context, state) {
+                          if (state is TTSPlaySuccess) {
+                            _playBytesAsAudio(state.text);
+                          }
+                        },
+                        builder: (context, state) {
+                          return Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.play_arrow, color: Colors.white, size: 30),
+                              onPressed: () {
+                                final combined = _alternativeContainerItems.map((item) => item['labelText']).join(' ');
+                                context.read<BoardBloc>().add(PlayTTS(text: combined));
+                              },
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 10),
                       Container(
-                        width: 80,
-                        height: 80,
+                        width: 50,
+                        height: 50,
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
                           icon: const Icon(
-                              Icons.close, color: Colors.white, size: 50),
+                              Icons.close, color: Colors.white, size: 30),
                           onPressed: () {
                             setState(() {
                               _alternativeContainerItems
                                   .clear(); // Clear items on close
                             });
+                          },
+                        ),
+                      ),
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.lock, color: Colors.white, size: 30),
+                          onPressed: () {
+                            _onReturnIconTap();
+
                           },
                         ),
                       ),

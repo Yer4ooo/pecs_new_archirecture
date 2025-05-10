@@ -13,12 +13,12 @@ class LibraryApiService {
 
   Future<List<CateoriesListModel>?> getCategories() => _networkClient.getData<List<CateoriesListModel>>(
         endpoint: 'categories',
-        parser: (response) =>CateoriesListModel.fromList(response['object_list'])
+        parser: (response) =>CateoriesListModel.fromList(response['items'])
       );
        Future<List<CateoriesImagesListModel>?> getCategoryImagesbyId({required int? id}) => _networkClient.getData<List<CateoriesImagesListModel>>(
        
         endpoint: 'categories/$id/images',
-        parser: (response) =>CateoriesImagesListModel.fromList(response['images'])
+        parser: (response) =>CateoriesImagesListModel.fromList(response['items'])
       );
       Future<CateoriesCreateResponseModel?> createCategory({CategoriesCreateRequestModel? category}) => _networkClient.postData<CateoriesCreateResponseModel>
       (endpoint: 'categories',

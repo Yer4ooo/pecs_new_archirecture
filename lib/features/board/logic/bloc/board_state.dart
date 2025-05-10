@@ -23,3 +23,15 @@ class BoardFailure extends BoardState {
 
   BoardFailure({required this.error});
 }
+
+class TTSPlaySuccess extends BoardState {
+  final List<int> text;
+
+  TTSPlaySuccess({required this.text});
+}
+
+class TTSPlayFailure extends BoardState {
+  final String error;
+
+  TTSPlayFailure({required this.error});
+}

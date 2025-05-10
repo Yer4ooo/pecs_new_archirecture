@@ -9,19 +9,15 @@ part 'board_event.dart';
 part 'board_state.dart';
 
 class BoardBloc extends Bloc<BoardEvent, BoardState> {
-
   BoardBloc() : super(BoardInitial()) {
-
     final dio = Dio();
-    
+
     on<FetchBoards>((event, emit) async {
-        final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
+      final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
 
       emit(BoardLoading());
 
       try {
-    
-
         final response = await dio.get(
           "https://api.pecs.qys.kz/my_boards",
           options: Options(
@@ -31,8 +27,7 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
           ),
         );
 
-        final BoardModel boardData =
-        BoardModel.fromJson(response.data);
+        final BoardModel boardData = BoardModel.fromJson(response.data);
 
         emit(BoardSuccess(boardData: boardData));
       } catch (error) {
@@ -40,13 +35,11 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
       }
     });
     on<CreateBoard>((event, emit) async {
-        final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
+      final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
 
       emit(BoardLoading());
 
       try {
- 
-
         final response = await dio.post(
           "https://api.pecs.qys.kz/my_boards",
           data: {
@@ -67,5 +60,28 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
       }
     });
 
+    on<PlayTTS>((event, emit) async {
+      final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
+      print("!!!!!!!!!!!!!!!!!!!!!");
+      print(event.text);
+      print("!!!!!!!!!!!!!!!!!!!!!");
+      try {
+        Response response = await dio.post(
+          "https://api.pecs.qys.kz/tts/convert",
+          data: {"text": event.text, "voice_language": "ru"},
+          options: Options(
+            responseType: ResponseType.bytes,
+            headers: {
+              "Authorization": "Bearer $token",
+              "Content-Type": "application/json",
+            },
+          ),
+        );
+        print(response.data);
+        emit(TTSPlaySuccess(text: response.data));
+      } catch (error) {
+        emit(TTSPlayFailure(error: error.toString()));
+      }
+    });
   }
 }
