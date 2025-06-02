@@ -1,30 +1,35 @@
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:just_audio/just_audio.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../home/presentation/screens/widgets/home_top_widget.dart';
+import 'package:path_provider/path_provider.dart';
 import '../logic/bloc/board_bloc.dart';
 import '../widgets/bottom_board.dart';
-import '../logic/models/board_details_model.dart';
 
 class Board extends StatefulWidget {
-  final String boardId;
-  const Board({required this.boardId, super.key});
-
+  const Board({super.key});
 
   @override
   State<Board> createState() => _BoardState();
 }
-
+class BoardType {
+  final String name;
+  final Color color;
+  final List<List<Map<String, String>>> rows;
+  final int numOfRows;
+  BoardType(this.name, this.color, this.rows, this.numOfRows);
+}
 class _BoardState extends State<Board> {
+  List<BoardType> boards = [
+    BoardType('Доска 1', Color.fromRGBO(97, 148, 81, 1), [[], [], [], [], []], 3),
+    BoardType('Доска 2', Colors.blue, [[], [], [], [], []], 5),
+  ];
   int curBoardId = 0;
   final List<Map<String, String>> _alternativeContainerItems = [];
   bool _showPecsExpandedBubbles = false;
   String? _selectedBubble;
-  bool _dragImages = false;
   bool _isMediaGridVisible = true;
   bool _expandedBubbles = false;
   String name = 'untitled';
@@ -32,11 +37,9 @@ class _BoardState extends State<Board> {
   int numOfRows = 5;
 
   int dropdownvalue = 5;
-  @override
-  void initState() {
-    super.initState();
-    context.read<BoardBloc>().add(FetchBoardDetails(boardId: widget.boardId));
-  }
+
+
+  // Method to handle bubble tap and show images or expanded bubbles
   void _onBubbleTap(String bubbleName) {
     setState(() {
       if (bubbleName == 'Карточки PECS') {
@@ -80,154 +83,204 @@ class _BoardState extends State<Board> {
       }
     });
   }
-  hexColor(String color) {
-    String colorNew = '0xFF' + color;
-    colorNew = colorNew.replaceAll('#', '');
-    int colorInt = int.parse(colorNew);
-    return colorInt;
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const HomeTopWidget(),
-          Expanded(
-            child: BlocBuilder<BoardBloc, BoardState>(
-              builder: (context, state) {
-                if (state is BoardLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is BoardDetailsFailure) {
-                  return const Center(child: Text("Ошибка загрузки доски"));
-                } else if (state is BoardDetailsSuccess) {
-                  final board = state.boardDetails.board;
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 400,
-                        color: Color(hexColor(board.tabs[curBoardId].color)),
-                        child: Stack(
-                          children: [Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ...List.generate(board.tabs[curBoardId].strapsNum, (index) => _buildDragTarget(index)),
-                          ]
-                        ),
-                            Align(
-                              alignment: Alignment.topRight,
-                              child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                icon: Icon(
-                                    _dragImages ? Icons.lock_open : Icons.lock, color: Colors.white, size: 30),
-                                onPressed: () {
-                                  setState(() {
-                                    _dragImages = !_dragImages;
-                                  });
-                                },
-                              ),
-                            ),)
-                                ],)
-                      ),
-                      Stack(
-                        children: [
-                          Row(children: [
-                            ...board.tabs.asMap().entries.map((entry) {
-                              int index = entry.key;
-                              final tab = entry.value;
-                              return InkWell(
-                                child: Container(
-                                    height: 50,
-                                    width: 180,
-                                    decoration: BoxDecoration(
-                                      color: Color(hexColor(tab.color)),
-                                      borderRadius: const BorderRadius.only(
-                                        bottomRight: Radius.circular(16.0),
-                                        bottomLeft: Radius.circular(16.0),
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Center(
-                                            child: Text(
-                                              tab.name,
-                                              style: TextStyle(color: Colors.white, fontSize: 16),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-                                          Align(
-                                              alignment: Alignment.topRight,
-                                              child: IconButton(
-                                                icon: Icon(Icons.settings),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    curBoardId = index;
-                                                  });
-                                                },
-                                              ))
-                                        ],
-                                      ),
-                                    )),
-                                onTap: () {
-                                  setState(() {
-                                    curBoardId = index;
-                                  });
-                                  ();
-                                },
-                              );
-                            }),
-                            Container(
+    return BlocListener<BoardBloc, BoardState>(
+        listener: (context, state) {
+          if (state is BoardCreated) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Board '${state.boardName}' created!")),
+            );
+          } else if (state is BoardFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Failed to create board22: ${state.error}")),
+            );
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  height: 400,
+                  color: boards[curBoardId].color,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(boards[curBoardId].numOfRows, (index) => _buildDragTarget(index)),
+                  ),
+                ),
+                Stack(
+                  children: [
+                    Container(
+                      height: 70,
+                    ),
+                    Row(children: [
+                      ...boards.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        BoardType board = entry.value;
+                        return InkWell(
+                          child: Container(
                               height: 50,
                               width: 180,
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade400,
+                                color: board.color,
                                 borderRadius: const BorderRadius.only(
                                   bottomRight: Radius.circular(16.0),
-                                  bottomLeft: Radius.circular(16.0),
                                 ),
                               ),
                               child: Center(
-                                child: IconButton(
-                                  onPressed: () {
-                                  },
-                                  icon: const Icon(Icons.add, color: Colors.white),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Center(
+                                      child: Text(
+                                        board.name,
+                                        style: TextStyle(color: Colors.white, fontSize: 16),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    Align(
+                                        alignment: Alignment.topRight,
+                                        child: IconButton(
+                                          icon: Icon(Icons.settings),
+                                          onPressed: () {
+                                            setState(() {
+                                              curBoardId = index;
+                                              _onEditBoard();
+                                            });
+                                          },
+                                        ))
+                                  ],
                                 ),
-                              ),
-                            ),
-                          ]),
-                        ],
+                              )),
+                          onTap: () {
+                            setState(() {
+                              curBoardId = index;
+                            });
+                            ();
+                          },
+                        );
+                      }),
+                      Container(
+                        height: 50,
+                        width: 180,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade400,
+                          borderRadius: const BorderRadius.only(
+                            bottomRight: Radius.circular(16.0),
+                          ),
+                        ),
+                        child: Center(
+                          child: IconButton(
+                            onPressed: () {
+                              _onCreateNewBoard();
+                            },
+                            icon: const Icon(Icons.add, color: Colors.white),
+                          ),
+                        ),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Expanded(
-                        child: _dragImages ? _buildAlternativeContainer() : _buildLibraryContainer(),
+                    ]),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16, bottom: 5),
+                  child: Container(
+                    color: Colors.grey,
+                    height: 200,
+                    child: _isMediaGridVisible
+                        ? Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        _buildHeader(),
+                        _selectedBubble != null
+                            ? _buildImageGrid(_selectedBubble!)
+                            : _showPecsExpandedBubbles
+                            ? _buildPecsExpandedBubbles()
+                            : _buildBubbles(),
+                      ],
                     )
-                  ]
-                  );
-                } else {
-                  return const SizedBox();
-                }
-              },
+                        : _buildAlternativeContainer(),
+                  ),
+                )
+              ],
             ),
           ),
+        ));
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      height: 50,
+      color: const Color.fromRGBO(77, 77, 77, 1),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(
+                    Icons.arrow_back_ios_new, size: 25, color: Colors.white),
+                onPressed: _onBackButtonTap,
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'Медиатека',
+                style: TextStyle(fontSize: 24,
+                    color: Colors.white,
+                    fontFamily: 'Montserrat'),
+              ),
+            ],
+          ),
+          _buildSearchBar(),
         ],
       ),
     );
   }
-  Widget _buildLibraryContainer(){
-    return Container(color: Colors.deepOrange,);
+
+  Widget _buildSearchBar() {
+    return Row(
+      children: [
+        Container(
+          height: 35,
+          width: 220,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Row(
+            children: const [
+              Icon(Icons.search, size: 20, color: Colors.grey),
+              SizedBox(width: 5),
+              Text(
+                'Search',
+                style: TextStyle(
+                    fontSize: 18, color: Colors.grey, fontFamily: 'Montserrat'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 20),
+        const CircleAvatar(
+          radius: 20,
+          backgroundColor: Colors.grey,
+          child: Icon(Icons.arrow_drop_up, size: 35, color: Colors.black),
+        ),
+        const SizedBox(width: 5),
+        CircleAvatar(
+          radius: 20,
+          backgroundColor: const Color.fromRGBO(197, 73, 7, 1),
+          child: IconButton(
+            icon: const Icon(Icons.close, size: 25, color: Colors.black),
+            onPressed: _onCloseIconTap, // Call method to close media grid
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildAlternativeContainer() {
@@ -250,6 +303,7 @@ class _BoardState extends State<Board> {
         return Center(
           child: Container(
             width: double.infinity,
+            height: 250,
             color: Colors.amber.shade500,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,25 +343,7 @@ class _BoardState extends State<Board> {
                   padding: const EdgeInsets.only(right: 15.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: const Icon(
-                            Icons.close, color: Colors.white, size: 30),
-                        onPressed: () {
-                          setState(() {
-                            _alternativeContainerItems
-                                .clear();
-                          });
-                        },
-                      ),
-                    ),
-                      const SizedBox(height: 10),
+                    children: [
                       BlocConsumer<BoardBloc, BoardState>(
                         listener: (context, state) {
                           if (state is TTSPlaySuccess) {
@@ -331,6 +367,40 @@ class _BoardState extends State<Board> {
                             ),
                           );
                         },
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(
+                              Icons.close, color: Colors.white, size: 30),
+                          onPressed: () {
+                            setState(() {
+                              _alternativeContainerItems
+                                  .clear(); // Clear items on close
+                            });
+                          },
+                        ),
+                      ),
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.lock, color: Colors.white, size: 30),
+                          onPressed: () {
+                            _onReturnIconTap();
+
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -389,6 +459,7 @@ class _BoardState extends State<Board> {
       return DragTarget<Map<String, String>>(
         onAccept: (data) {
           setState(() {
+            boards[curBoardId].rows[index].add(data); // Add new image to list
           });
         },
         builder: (context, candidateData, rejectedData) {
@@ -407,53 +478,54 @@ class _BoardState extends State<Board> {
                     width: 200,
                     // Remove fixed height to allow content to expand
                     color: Colors.transparent,
-                    // child: Column(
-                    //   children: boards[curBoardId].rows[index].map((image) {
-                    //     if (_isMediaGridVisible) {
-                    //       return SizedBox(
-                    //         width: 120,
-                    //         height: 100,
-                    //         child: Stack(
-                    //           children: [
-                    //             _buildDroppedImageThumbnail(image),
-                    //             Align(
-                    //               alignment: Alignment.topRight,
-                    //               child: CircleAvatar(
-                    //                 radius: 15,
-                    //                 child: IconButton(
-                    //                   icon: const Icon(Icons.close, size: 15,
-                    //                       color: Colors.black),
-                    //                   onPressed: (){
-                    //                     setState(() {
-                    //                     });
-                    //                   },
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       );
-                    //     }
-                    //     else {
-                    //       return Draggable<Map<String, String>>(
-                    //         data: image, // Enable dragging specific items
-                    //         feedback: Material(
-                    //           borderRadius: BorderRadius.circular(10),
-                    //           child: SizedBox(
-                    //             width: 120,
-                    //             height: 100,
-                    //             child: _buildDroppedImageThumbnail(image),
-                    //           ),
-                    //         ),
-                    //         child: SizedBox(
-                    //           width: 120,
-                    //           height: 100,
-                    //           child: _buildDroppedImageThumbnail(image),
-                    //         ),
-                    //       );
-                    //     }
-                    //   }).toList(),
-                    // ),
+                    child: Column(
+                      children: boards[curBoardId].rows[index].map((image) {
+                        if (_isMediaGridVisible) {
+                          return SizedBox(
+                            width: 120,
+                            height: 100,
+                            child: Stack(
+                              children: [
+                                _buildDroppedImageThumbnail(image),
+                                Align(
+                                  alignment: Alignment.topRight,
+                                  child: CircleAvatar(
+                                    radius: 15,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close, size: 15,
+                                          color: Colors.black),
+                                      onPressed: (){
+                                        setState(() {
+                                          boards[curBoardId].rows[index].remove(image);
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        else {
+                          return Draggable<Map<String, String>>(
+                            data: image, // Enable dragging specific items
+                            feedback: Material(
+                              borderRadius: BorderRadius.circular(10),
+                              child: SizedBox(
+                                width: 120,
+                                height: 100,
+                                child: _buildDroppedImageThumbnail(image),
+                              ),
+                            ),
+                            child: SizedBox(
+                              width: 120,
+                              height: 100,
+                              child: _buildDroppedImageThumbnail(image),
+                            ),
+                          );
+                        }
+                      }).toList(),
+                    ),
                   ),
                 ],
               ),
@@ -477,53 +549,54 @@ class _BoardState extends State<Board> {
                 width: 200,
                 // Remove fixed height to allow content to expand
                 color: Colors.transparent,
-                // child: Column(
-                //   children: boards[curBoardId].rows[index].map((image) {
-                //     if (_isMediaGridVisible) {
-                //       return SizedBox(
-                //         width: 120,
-                //         height: 100,
-                //         child: Stack(
-                //           children: [
-                //             _buildDroppedImageThumbnail(image),
-                //             Align(
-                //               alignment: Alignment.topRight,
-                //               child: CircleAvatar(
-                //                 radius: 15,
-                //                 child: IconButton(
-                //                   icon: const Icon(Icons.close, size: 15,
-                //                       color: Colors.black),
-                //                   onPressed: (){
-                //                     setState(() {
-                //                     });
-                //                   },
-                //                 ),
-                //               ),
-                //             ),
-                //           ],
-                //         ),
-                //       );
-                //     }
-                //     else {
-                //       return Draggable<Map<String, String>>(
-                //         data: image, // Enable dragging specific items
-                //         feedback: Material(
-                //           borderRadius: BorderRadius.circular(10),
-                //           child: SizedBox(
-                //             width: 120,
-                //             height: 100,
-                //             child: _buildDroppedImageThumbnail(image),
-                //           ),
-                //         ),
-                //         child: SizedBox(
-                //           width: 120,
-                //           height: 100,
-                //           child: _buildDroppedImageThumbnail(image),
-                //         ),
-                //       );
-                //     }
-                //   }).toList(),
-                // ),
+                child: Column(
+                  children: boards[curBoardId].rows[index].map((image) {
+                    if (_isMediaGridVisible) {
+                      return SizedBox(
+                        width: 120,
+                        height: 100,
+                        child: Stack(
+                          children: [
+                            _buildDroppedImageThumbnail(image),
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: CircleAvatar(
+                                radius: 15,
+                                child: IconButton(
+                                  icon: const Icon(Icons.close, size: 15,
+                                      color: Colors.black),
+                                  onPressed: (){
+                                    setState(() {
+                                      boards[curBoardId].rows[index].remove(image);
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    else {
+                      return Draggable<Map<String, String>>(
+                        data: image, // Enable dragging specific items
+                        feedback: Material(
+                          borderRadius: BorderRadius.circular(10),
+                          child: SizedBox(
+                            width: 120,
+                            height: 100,
+                            child: _buildDroppedImageThumbnail(image),
+                          ),
+                        ),
+                        child: SizedBox(
+                          width: 120,
+                          height: 100,
+                          child: _buildDroppedImageThumbnail(image),
+                        ),
+                      );
+                    }
+                  }).toList(),
+                ),
               ),
             ],
           ),
@@ -693,6 +766,7 @@ class _BoardState extends State<Board> {
                       Navigator.pop(dialogContext);
                       parentContext.read<BoardBloc>().add(CreateBoard(name: dialogName));
                       setState(() {
+                        boards.add(BoardType(dialogName, color, [[], [], [], [], []], dialogNumOfRows));
                         name = 'Без названия';
                         color = Color.fromRGBO(97, 148, 81, 1);
                       });
@@ -811,7 +885,7 @@ class _BoardState extends State<Board> {
                           style: TextStyle(fontSize: 20),)),
                     TextField(
                       decoration: InputDecoration(
-                          hintText: ""),
+                          hintText: boards[curBoardId].name),
                       onChanged: (text) {
                         dialogName = text;
                       },
@@ -827,6 +901,9 @@ class _BoardState extends State<Board> {
                         onPressed: () {
                           Navigator.pop(context);
                           setState(() {
+                            boards[curBoardId] = BoardType(
+                                dialogName, color, boards[curBoardId].rows,
+                                dialogNumOfRows);
                             name = 'untitled';
                             color = Color.fromRGBO(97, 148, 81, 1);
                           });
@@ -841,5 +918,4 @@ class _BoardState extends State<Board> {
       },
     );
   }
-
 }
