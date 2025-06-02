@@ -53,9 +53,9 @@ class _CategoriesState extends State<Categories> {
       create: (context) => sl<LibraryBloc>()..add(GetCategories()),
       child: Scaffold(
         body: BlocBuilder<LibraryBloc, LibraryState>(builder: (context, state) {
-          print('Current state: $state');
+          
           if (state is CategoriesLoading) {
-            print('I am state Loading');
+           
             return Column(
               children: [
                 HomeTopWidget(),
@@ -74,7 +74,7 @@ final List<CateoriesListModel>? filteredCategories = _searchQuery.isEmpty
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  HomeTopWidget(),
+                 
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
                     child: Container(

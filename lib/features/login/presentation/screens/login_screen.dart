@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pecs_new_arch/features/home/presentation/screens/home_screen.dart';
-import 'package:pecs_new_arch/features/login/data/models/login_request_model.dart';
-import 'package:pecs_new_arch/features/login/presentation/bloc/login_bloc.dart';
+import 'package:pecs_new_arch/features/start/data/models/login_request_model.dart';
+import 'package:pecs_new_arch/features/start/presentation/bloc/login_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -135,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                     context.read<LoginBloc>().add(
                                           Login(
-                                            user: LoginRequestModel(username: username, password: password),
+                                            user: LoginRequestModel(identifier: username, password: password),
                                           ),
                                         );
                                   },

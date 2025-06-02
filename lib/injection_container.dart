@@ -9,11 +9,11 @@ import 'package:pecs_new_arch/features/library/domain/usecases/create_image_usec
 import 'package:pecs_new_arch/features/library/domain/usecases/get_categories_usecase.dart';
 import 'package:pecs_new_arch/features/library/domain/usecases/get_category_images_usecase.dart';
 import 'package:pecs_new_arch/features/library/presentation/bloc/library_bloc.dart';
-import 'package:pecs_new_arch/features/login/data/datasource/login_datasource.dart';
-import 'package:pecs_new_arch/features/login/data/repository/login_repository_impl.dart';
-import 'package:pecs_new_arch/features/login/domain/repository/login_repository.dart';
-import 'package:pecs_new_arch/features/login/domain/usecase/login_usecase.dart';
-import 'package:pecs_new_arch/features/login/presentation/bloc/login_bloc.dart';
+import 'package:pecs_new_arch/features/start/data/datasource/login_datasource.dart';
+import 'package:pecs_new_arch/features/start/data/repository/login_repository_impl.dart';
+import 'package:pecs_new_arch/features/start/domain/repository/login_repository.dart';
+import 'package:pecs_new_arch/features/start/domain/usecase/login_usecase.dart';
+import 'package:pecs_new_arch/features/start/presentation/bloc/login_bloc.dart';
 import 'package:pecs_new_arch/features/registration/data/datasourse/registration_api_service.dart';
 import 'package:pecs_new_arch/features/registration/data/repository/registration_repo_impl.dart';
 import 'package:pecs_new_arch/features/registration/domain/repository/registration_repository.dart';

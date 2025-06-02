@@ -58,14 +58,19 @@ dependencies:
   flutter_colorpicker: ^1.1.0
   super_drag_and_drop: ^0.8.24
   just_audio: ^0.9.36
-
+  dropdown_search: ^5.0.6
+  flutter_side_menu: ^0.5.41
+  badges: ^3.1.2
+  sidebarx: ^0.17.1
 flutter:
   uses-material-design: true
   generate: true
   assets:
-    - assets/icons/svg/
+    - assets/svg/
     - assets/translations/
     - assets/jpg/
+    - assets/icons/svg/
+
 
   fonts:
     - family: Montserrat

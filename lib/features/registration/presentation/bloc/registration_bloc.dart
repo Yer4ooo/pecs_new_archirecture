@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:pecs_new_arch/core/mixin/bloc_operations_mixin.dart';
 import 'package:pecs_new_arch/core/network/custom_exceptions.dart';
+import 'package:pecs_new_arch/features/registration/data/models/registration_model.dart';
 import 'package:pecs_new_arch/features/registration/data/models/signup_request_model.dart';
 import 'package:pecs_new_arch/features/registration/domain/usecases/registration_usecase.dart';
 import 'package:pecs_new_arch/injection_container.dart';

@@ -27,7 +27,6 @@ class _BoardsScreenState extends State<BoardsScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const HomeTopWidget(),
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(

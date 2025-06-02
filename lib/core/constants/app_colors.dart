@@ -28,7 +28,7 @@ class AppColors {
   static const Color openBlue = Color(0xFF9ABEED);
 
   // Dark Green Color - 0xFF006400
-  static const Color darkGreen = Color(0xFF006400);
+  static const Color darkGreen = Color(0xFF619451);
 
   static const Color senderMessageColor = Color(0xFFF1F1F1);
 

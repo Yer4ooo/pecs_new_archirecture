@@ -1,5 +1,14 @@
 class AppIcons {
   static const String arrowBack = 'assets/icons/svg/arrow_back.svg';
+  static const String hidePassword = 'assets/icons/svg/hide_password.svg';
+    static const String person = 'assets/icons/svg/person.svg';
+  static const String people = 'assets/icons/svg/people.svg';
+  static const String book = 'assets/icons/svg/book.svg';
+  static const String settings = 'assets/icons/svg/settings.svg';
+  static const String analysis = 'assets/icons/svg/analysis.svg';
+  static const String logout = 'assets/icons/svg/logout.svg';
+    static const String boards = 'assets/icons/svg/boards.svg';
+
 
 
 

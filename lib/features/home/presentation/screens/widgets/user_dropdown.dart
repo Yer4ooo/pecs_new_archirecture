@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:pecs_new_arch/core/utils/key_value_storage_service.dart';
 import 'package:pecs_new_arch/features/start/presentation/start_page.dart';
 
 
@@ -49,10 +51,15 @@ class _UserDropdownState extends State<UserDropdown> {
               }else if (selectedItem == 'Settings') {
                 // Navigate to settings page
               } else if (selectedItem == 'Logout') {
-               Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => StartPage()),
-                );
+               GetIt.I<KeyValueStorageService>().resetKeys();
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const StartPage(),
+                                        ),
+                                        (route) => false,
+                                      );
+
               }                                  
               // Add other actions for 'Settings' and 'Logout' here
             },

@@ -223,7 +223,7 @@ class NetworkClient implements NetworkClientInterface {
   }
 
   @override
-  Future<T?> postData<T>({
+  Future<T?>  postData<T>({
     required String endpoint,
     required dynamic body,
     CancelToken? cancelToken,
