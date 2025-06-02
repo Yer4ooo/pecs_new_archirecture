@@ -12,6 +12,16 @@ class BoardSuccess extends BoardState {
   BoardSuccess({required this.boardData});
 }
 
+class BoardDetailsSuccess extends BoardState{
+  final BoardDetailsModel boardDetails;
+
+  BoardDetailsSuccess({required this.boardDetails});
+}
+class BoardDetailsFailure extends BoardState {
+  final String error;
+
+  BoardDetailsFailure({required this.error});
+}
 class BoardCreated extends BoardState {
   final String boardName;
 

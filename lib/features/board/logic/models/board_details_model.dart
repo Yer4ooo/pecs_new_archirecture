@@ -1,28 +1,28 @@
 import 'dart:convert';
 
-BoardModel boardModelFromJson(String str) {
+BoardDetailsModel boardDetailsModelFromJson(String str) {
   final jsonData = json.decode(str);
-  return BoardModel.fromJson(jsonData);
+  return BoardDetailsModel.fromJson(jsonData);
 }
 
-String boardModelToJson(BoardModel data) {
+String boardDetailsModelToJson(BoardDetailsModel data) {
   final dyn = data.toJson();
   return json.encode(dyn);
 }
 
-class BoardModel {
-  List<Board> boards;
+class BoardDetailsModel {
+  Board board;
 
-  BoardModel({
-    required this.boards,
+  BoardDetailsModel({
+    required this.board,
   });
 
-  factory BoardModel.fromJson(Map<String, dynamic> json) => new BoardModel(
-    boards: new List<Board>.from(json["boards"].map((x) => Board.fromJson(x))),
+  factory BoardDetailsModel.fromJson(Map<String, dynamic> json) => new BoardDetailsModel(
+    board: Board.fromJson(json["board"]),
   );
 
   Map<String, dynamic> toJson() => {
-    "boards": new List<dynamic>.from(boards.map((x) => x.toJson())),
+    "board": board.toJson(),
   };
 }
 

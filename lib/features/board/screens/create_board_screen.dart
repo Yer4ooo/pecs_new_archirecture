@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pecs_new_arch/features/board/logic/bloc/board_bloc.dart';
+
+import '../logic/bloc/board_bloc.dart';
 
 class CreateBoardScreen extends StatefulWidget {
-  const CreateBoardScreen({super.key});
+  String? childId;
+  CreateBoardScreen({required this.childId, super.key});
 
   @override
   State<CreateBoardScreen> createState() => _CreateBoardScreenState();
@@ -14,8 +16,8 @@ class _CreateBoardScreenState extends State<CreateBoardScreen> {
 
   void _submit() {
     final name = _nameController.text.trim();
-    if (name.isNotEmpty) {
-      context.read<BoardBloc>().add(CreateBoard(name: name));
+    if (name.isNotEmpty && widget.childId != null) {
+      context.read<BoardBloc>().add(CreateBoardForChild(name: name, color: '#F3EFDD', childId: widget.childId!, private: true));
     }
   }
 
@@ -36,7 +38,7 @@ class _CreateBoardScreenState extends State<CreateBoardScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Доска '${state.boardName}' успешно создана")),
             );
-            context.read<BoardBloc>().add(FetchBoards());
+            context.read<BoardBloc>().add(FetchBoardsById(childId: widget.childId!));
           } else if (state is BoardFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Ошибка: ${state.error}")),
