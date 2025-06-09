@@ -10,28 +10,30 @@ import 'children_state.dart';
 class ChildrenBloc extends Bloc<ChildrenEvent, ChildrenState> {
   ChildrenBloc() : super(ChildrenInitial()) {
     final dio = Dio();
-     on<FetchChildren>((event, emit) async {
-        final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
+    on<FetchChildren>((event, emit) async {
+      final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
+      emit(ChildrenLoading());
+      try {
+        final response = await dio.get(
+          "https://api.pecs.qys.kz/parent/children",
+          options: Options(
+            headers: {
+              "Authorization": "Bearer $token",
+            },
+          ),
+        );
 
-        emit(ChildrenLoading());
+        print("API Response: ${response.data}");
 
-        try {
-          final response = await dio.get(
-            "https://api.pecs.qys.kz/parent/children",
-            options: Options(
-              headers: {
-                "Authorization": "Bearer $token",
-              },
-            ),
-          );
+        final ChildrenModel childrenData = ChildrenModel.fromJson(response.data);
 
-          // Parse the response using your existing model
-          final ChildrenModel childrenData = ChildrenModel.fromJson(response.data);
+        print("Parsed Children Data: ${childrenData.children}");
 
-          emit(ChildrenSuccess(childrenData: childrenData));
-        } catch (error) {
-          emit(ChildrenFailure(error: error.toString()));
-        }
-      });
+        emit(ChildrenSuccess(childrenData: childrenData));
+      } catch (error, stackTrace) {
+        print("Error: $error\nStackTrace: $stackTrace");
+        emit(ChildrenFailure(error: error.toString()));
+      }
+    });
     }
   }

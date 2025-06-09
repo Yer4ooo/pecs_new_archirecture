@@ -1,14 +1,11 @@
-import 'dart:ui';
-
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:hive/hive.dart';
+import 'package:pproj/features/board/logic/models/tab_create_model.dart';
 import '../../../../core/utils/key_value_storage_service.dart';
 import '../models/board_create_model.dart';
 import '../models/board_details_model.dart';
 import '../models/board_model.dart';
-
 part 'board_event.dart';
 part 'board_state.dart';
 
@@ -85,16 +82,44 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
       }
     });
 
+    on<CreateTabForChild>((event, emit) async {
+      final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
+
+      emit(BoardLoading());
+
+      try {
+        final tabCreateModel = TabCreateModel(
+          name: event.name,
+          color: event.color,
+          boardId: event.boardId,
+          strapsNum: event.strapsNum,
+        );
+
+        final response = await dio.post(
+          "https://api.pecs.qys.kz/boards/tabs/",
+          data: tabCreateModel.toJson(),
+          options: Options(
+            headers: {
+              "Authorization": "Bearer $token",
+              "Content-Type": "application/json",
+            },
+          ),
+        );
+        emit(TabCreated(tabName: event.name));
+      } catch (error) {
+        emit(BoardFailure(error: error.toString()));
+      }
+    });
 
     on<PlayTTS>((event, emit) async {
       final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
-      print("!!!!!!!!!!!!!!!!!!!!!");
-      print(event.text);
-      print("!!!!!!!!!!!!!!!!!!!!!");
       try {
         Response response = await dio.post(
           "https://api.pecs.qys.kz/tts/convert",
-          data: {"text": event.text, "voice_language": "ru"},
+          data: {
+            "image_ids": event.image_ids,
+            "voice_language": "en",
+          },
           options: Options(
             responseType: ResponseType.bytes,
             headers: {
@@ -103,8 +128,14 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
             },
           ),
         );
-        print(response.data);
-        emit(TTSPlaySuccess(text: response.data));
+        if (state is BoardDetailsSuccess) {
+          emit(TTSPlaySuccess(
+            text: response.data,
+            boardDetails: (state as BoardDetailsSuccess).boardDetails,
+          ));
+        } else {
+          emit(TTSPlayFailure(error: "Board details are not available"));
+        }
       } catch (error) {
         emit(TTSPlayFailure(error: error.toString()));
       }

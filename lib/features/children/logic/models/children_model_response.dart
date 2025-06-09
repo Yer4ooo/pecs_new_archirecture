@@ -34,46 +34,50 @@ class Child {
   int id;
   String firstName;
   String lastName;
+  String username;
+  int age;
   dynamic profilePic;
   String gender;
   String dateOfBirth;
-  List<dynamic> specialistsSolo;
+  List<dynamic> specialistSolos;
   List<dynamic> organisations;
-  String username;
 
   Child({
     required this.id,
     required this.firstName,
     required this.lastName,
+    required this.username,
+    required this.age,
     required this.profilePic,
     required this.gender,
     required this.dateOfBirth,
-    required this.specialistsSolo,
+    required this.specialistSolos,
     required this.organisations,
-    required this.username,
   });
 
   factory Child.fromJson(Map<String, dynamic> json) => new Child(
     id: json["id"],
     firstName: json["first_name"],
     lastName: json["last_name"],
+    username: json["username"],
+    age: json["age"],
     profilePic: json["profile_pic"],
     gender: json["gender"],
     dateOfBirth: json["date_of_birth"],
-    specialistsSolo: new List<dynamic>.from(json["specialists_solo"].map((x) => x)),
+    specialistSolos: new List<dynamic>.from(json["specialist_solos"].map((x) => x)),
     organisations: new List<dynamic>.from(json["organisations"].map((x) => x)),
-    username: json["username"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "first_name": firstName,
     "last_name": lastName,
+    "username": username,
+    "age": age,
     "profile_pic": profilePic,
     "gender": gender,
     "date_of_birth": dateOfBirth,
-    "specialists_solo": new List<dynamic>.from(specialistsSolo.map((x) => x)),
+    "specialist_solos": new List<dynamic>.from(specialistSolos.map((x) => x)),
     "organisations": new List<dynamic>.from(organisations.map((x) => x)),
-    "username": username,
   };
 }
