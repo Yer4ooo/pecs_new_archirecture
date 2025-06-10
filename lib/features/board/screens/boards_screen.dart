@@ -37,6 +37,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
     return MultiBlocProvider(
         providers: [
           BlocProvider<BoardBloc>(create: (context) => BoardBloc()),
+          BlocProvider<ChildrenBloc>(create: (context) => ChildrenBloc()),
         ],
     child: Scaffold(
       backgroundColor: AppColors.white,

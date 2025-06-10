@@ -5,9 +5,12 @@ import 'dart:typed_data';
 import 'dart:math' as math;
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:pecs_new_arch/core/utils/key_value_storage_service.dart';
+import 'package:pecs_new_arch/features/start/presentation/start_page.dart';
+import 'package:pecs_new_arch/initapp.dart';
 import 'package:tuple/tuple.dart';
 
 class ApiInterceptor extends Interceptor {
@@ -67,6 +70,14 @@ class ApiInterceptor extends Interceptor {
       GetIt.I<KeyValueStorageService>().resetKeys();
       // GetIt.I<GlobalAuthBloc>().add(GlobalAuthEvent.logOut());
     }
+          navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => StartPage(),
+        ),
+        (route) => false,
+      );
+    
+
     return handler.next(err);
   }
 
