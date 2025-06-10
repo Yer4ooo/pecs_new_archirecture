@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pproj/features/board/screens/boards_screen.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import '../logic/bloc/board_bloc.dart';
 import 'board.dart';

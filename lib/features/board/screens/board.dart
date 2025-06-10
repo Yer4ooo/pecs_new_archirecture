@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:pproj/features/board/logic/models/board_details_model.dart';
-import 'package:pproj/features/board/logic/models/board_model.dart';
-import 'package:pproj/features/board/screens/create_tab_screen.dart';
+import 'package:pecs_new_arch/features/board/screens/create_tab_screen.dart';
+
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../injection_container.dart';

@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:pproj/features/board/logic/models/tab_create_model.dart';
+import 'package:pecs_new_arch/features/board/logic/models/tab_create_model.dart';
 import '../../../../core/utils/key_value_storage_service.dart';
 import '../models/board_create_model.dart';
 import '../models/board_details_model.dart';
