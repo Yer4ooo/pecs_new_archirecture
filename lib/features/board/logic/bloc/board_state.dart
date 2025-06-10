@@ -11,7 +11,6 @@ class BoardSuccess extends BoardState {
 
   BoardSuccess({required this.boardData});
 }
-
 class BoardDetailsSuccess extends BoardState{
   final BoardDetailsModel boardDetails;
 
@@ -27,6 +26,10 @@ class BoardCreated extends BoardState {
 
   BoardCreated({required this.boardName});
 }
+class TabCreated extends BoardState{
+  final String tabName;
+  TabCreated({required this.tabName});
+}
 
 class BoardFailure extends BoardState {
   final String error;
@@ -34,11 +37,15 @@ class BoardFailure extends BoardState {
   BoardFailure({required this.error});
 }
 
-class TTSPlaySuccess extends BoardState {
-  final List<int> text;
+class TTSPlaySuccess extends BoardDetailsSuccess {
+  final dynamic text;
 
-  TTSPlaySuccess({required this.text});
+  TTSPlaySuccess({
+    required this.text,
+    required super.boardDetails,
+  });
 }
+
 
 class TTSPlayFailure extends BoardState {
   final String error;

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../core/constants/app_colors.dart';
 import '../../children/logic/bloc/children_bloc.dart';
 import '../../children/logic/bloc/children_event.dart';
@@ -28,14 +27,18 @@ class _BoardsScreenState extends State<BoardsScreen> {
   String? selectedChildId;
 
   hexColor(String color) {
-    String colorNew = '0xFF' + color;
+    String colorNew = '0xFF$color';
     colorNew = colorNew.replaceAll('#', '');
     int colorInt = int.parse(colorNew);
     return colorInt;
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider<BoardBloc>(create: (context) => BoardBloc()),
+        ],
+    child: Scaffold(
       backgroundColor: AppColors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,7 +54,6 @@ class _BoardsScreenState extends State<BoardsScreen> {
             ),
           ),
               Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const CircleAvatar(
                       radius: 20.0,
@@ -226,7 +228,7 @@ class _BoardsScreenState extends State<BoardsScreen> {
                                         onTap: () => Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) => Board(boardId: board.id.toString()),
+                                            builder: (_) => BoardScreen(boardId: board.id.toString(),)
                                           ),
                                         ),
                                         child: Container(
@@ -235,10 +237,23 @@ class _BoardsScreenState extends State<BoardsScreen> {
                                             borderRadius: BorderRadius.circular(12),
                                           ),
                                           child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: const [
-                                              Divider(thickness: 20, color: Color(0xFFF3EFDD)),
-                                              Divider(thickness: 10, color: Color(0xFFD7DB3F)),
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Align(alignment: Alignment.topRight,
+                                                    child: IconButton(
+                                                      icon: Icon(Icons.edit),
+                                                      color: Colors.white,
+                                                      onPressed: () {},)),
+                                              ),
+                                              SizedBox(height: 50,),
+                                              Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Container(height: 30, color: Color(0xFFF3EFDD)),
+                                                    Container(height: 10, color: Color(0xFFD7DB3F)),
+                                                  ],
+                                                ),
                                             ],
                                           ),
                                         ),
@@ -305,6 +320,6 @@ class _BoardsScreenState extends State<BoardsScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 }

@@ -30,10 +30,23 @@ class CreateBoardForChild extends BoardEvent {
     required this.color,
   });
 }
+class CreateTabForChild extends BoardEvent{
+  final int boardId;
+  final String name;
+  final int strapsNum;
+  final String color;
+
+  CreateTabForChild({
+    required this.boardId,
+    required this.name,
+    required this.strapsNum,
+    required this.color,
+  });
+}
 
 
 class PlayTTS extends BoardEvent {
-  final String text;
+  final List<int> image_ids;
 
-  PlayTTS({required this.text});
+  PlayTTS({required this.image_ids});
 }
