@@ -18,6 +18,18 @@ class _SidebarWrapperState extends State<SidebarWrapper> {
   final _controller = SidebarXController(selectedIndex: 0, extended: true);
 final GlobalKey<NavigatorState> _nestedNavigatorKey = GlobalKey<NavigatorState>();
   final GlobalKey<NavigatorState> categoriesNavigatorKey=GlobalKey<NavigatorState>();
+@override
+void initState() {
+  super.initState();
+
+  _controller.addListener(() {
+    if (_controller.selectedIndex == 2) {
+      _nestedNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+    } else if (_controller.selectedIndex == 3) {
+      categoriesNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+    }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
