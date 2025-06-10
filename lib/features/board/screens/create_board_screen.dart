@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pecs_new_arch/features/board/screens/boards_screen.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:pecs_new_arch/initapp.dart';
 import '../logic/bloc/board_bloc.dart';
 
 class CreateBoardScreen extends StatefulWidget {
@@ -47,7 +48,7 @@ class _CreateBoardScreenState extends State<CreateBoardScreen> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => BoardsScreen(),
+                builder: (_) => BoardsScreen(navigatorKey: navigatorKey,),
               ),
             );
           ScaffoldMessenger.of(context).showSnackBar(

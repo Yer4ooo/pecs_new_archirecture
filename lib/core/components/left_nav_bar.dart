@@ -16,6 +16,8 @@ class SidebarWrapper extends StatefulWidget {
 
 class _SidebarWrapperState extends State<SidebarWrapper> {
   final _controller = SidebarXController(selectedIndex: 0, extended: true);
+final GlobalKey<NavigatorState> _nestedNavigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> categoriesNavigatorKey=GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +117,9 @@ class _SidebarWrapperState extends State<SidebarWrapper> {
             ),
             Expanded(
               child: Center(
-                child: _ScreensExample(controller: _controller),
+                child: _ScreensExample(controller: _controller,
+                  boardNavigatorKey: _nestedNavigatorKey, 
+                  categoriesNavigatorKey: categoriesNavigatorKey,)// Pass the nested navigator key),
               ),
             ),
           ],
@@ -127,24 +131,58 @@ class _SidebarWrapperState extends State<SidebarWrapper> {
 
 class _ScreensExample extends StatelessWidget {
   final SidebarXController controller;
+  final GlobalKey<NavigatorState> boardNavigatorKey;
+  final GlobalKey<NavigatorState> categoriesNavigatorKey;
 
-  const _ScreensExample({required this.controller});
+  const _ScreensExample({
+    required this.controller,
+    required this.boardNavigatorKey,
+        required this.categoriesNavigatorKey,
+
+  });
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: controller,
-      builder: (context, child) {
-        return IndexedStack(
-          index: controller.selectedIndex,
-          children:  [
-            ProfileScreen(),
-            SizedBox.shrink(),
-            BoardsScreen(), 
-            Categories(),
-            SizedBox.shrink(), // Placeholder for Analytics
-            SizedBox.shrink(), // Placeholder for Settings
-            SizedBox.shrink(), // Placeholder for Logout
+      builder: (context, _) {
+        return Stack(
+          children: [
+            Offstage(
+              offstage: controller.selectedIndex != 0,
+              child: const ProfileScreen(),
+            ),
+            Offstage(
+              offstage: controller.selectedIndex != 1,
+              child: const SizedBox.shrink(), // Мои дети
+            ),
+            Offstage(
+              offstage: controller.selectedIndex != 2,
+              child: Navigator(
+                key: boardNavigatorKey,
+                onGenerateRoute: (_) => MaterialPageRoute(
+                  builder: (_) => BoardsScreen(navigatorKey: boardNavigatorKey),
+                ),
+              ),
+            ),
+            Offstage(
+              offstage: controller.selectedIndex != 3,
+              child: Navigator(
+                key: categoriesNavigatorKey,
+                onGenerateRoute: (_) => MaterialPageRoute(
+                  builder: (_) => Categories(navigatorKey: categoriesNavigatorKey),
+                ),
+              ),
+            ),
+            
+            Offstage(
+              offstage: controller.selectedIndex != 4,
+              child: const SizedBox.shrink(), // Аналитика
+            ),
+            Offstage(
+              offstage: controller.selectedIndex != 5,
+              child: const SizedBox.shrink(), // Настройки
+            ),
           ],
         );
       },

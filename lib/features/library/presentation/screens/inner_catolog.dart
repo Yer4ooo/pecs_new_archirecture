@@ -63,7 +63,6 @@ class _InnerCatologState extends State<InnerCatolog> {
           if (state is CategoriesLoading) {
             return const Column(
               children: [
-                HomeTopWidget(),
                 Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -86,7 +85,6 @@ class _InnerCatologState extends State<InnerCatolog> {
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  HomeTopWidget(),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
                     child: Container(

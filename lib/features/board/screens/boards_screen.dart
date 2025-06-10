@@ -10,7 +10,9 @@ import 'board.dart';
 import 'create_board_screen.dart';
 
 class BoardsScreen extends StatefulWidget {
-  const BoardsScreen({super.key});
+  final GlobalKey<NavigatorState> navigatorKey;
+
+  const BoardsScreen({required this.navigatorKey, Key? key}) : super(key: key);
 
   @override
   State<BoardsScreen> createState() => _BoardsScreenState();
@@ -37,7 +39,6 @@ class _BoardsScreenState extends State<BoardsScreen> {
     return MultiBlocProvider(
         providers: [
           BlocProvider<BoardBloc>(create: (context) => BoardBloc()),
-          BlocProvider<ChildrenBloc>(create: (context) => ChildrenBloc()),
         ],
     child: Scaffold(
       backgroundColor: AppColors.white,
@@ -181,8 +182,8 @@ class _BoardsScreenState extends State<BoardsScreen> {
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
+                                   widget.navigatorKey.currentState?.push(
+                                    
                                     MaterialPageRoute(builder: (_) => CreateBoardScreen(childId: selectedChildId,)),
                                   );
                                 },
@@ -226,8 +227,8 @@ class _BoardsScreenState extends State<BoardsScreen> {
                                   children: [
                                     Expanded(
                                       child: GestureDetector(
-                                        onTap: () => Navigator.push(
-                                          context,
+                                        onTap: () => widget.navigatorKey.currentState?.push(
+                                          
                                           MaterialPageRoute(
                                             builder: (_) => BoardScreen(boardId: board.id.toString(),)
                                           ),

@@ -13,7 +13,9 @@ import 'package:pecs_new_arch/injection_container.dart';
 
 
 class Categories extends StatefulWidget {
-  const Categories({super.key});
+  final GlobalKey<NavigatorState> navigatorKey;
+
+  const Categories({super.key,required this.navigatorKey});
 
   @override
   State<Categories> createState() => _CategoriesState();
@@ -58,7 +60,6 @@ class _CategoriesState extends State<Categories> {
            
             return Column(
               children: [
-                HomeTopWidget(),
                 Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -131,8 +132,8 @@ final List<CateoriesListModel>? filteredCategories = _searchQuery.isEmpty
                       text: 'Загрузить изображение',
                       color: Colors.green.shade700,
                       onPressed: () {
-                        Navigator.push(
-                          context,
+                        widget.navigatorKey.currentState?.push(
+                          
                           MaterialPageRoute(builder: (_) => const ImageUploadForm()),
                         );
                       },
@@ -157,8 +158,8 @@ final List<CateoriesListModel>? filteredCategories = _searchQuery.isEmpty
                           title: category?.name ?? 'Category ${index + 1}',
                           imageUrl: category?.imageUrl ?? '',
                           onTap: () {
-                            Navigator.push(
-                                context, MaterialPageRoute(builder: (context) => InnerCatolog(id: category?.id ?? -1)));
+                            widget.navigatorKey.currentState?.push(
+                                MaterialPageRoute(builder: (context) => InnerCatolog(id: category?.id ?? -1)));
                           },
                         );
                       },

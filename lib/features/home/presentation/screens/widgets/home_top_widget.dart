@@ -5,6 +5,7 @@ import 'package:pecs_new_arch/features/board/screens/boards_screen.dart';
 import 'package:pecs_new_arch/features/home/presentation/screens/home_screen.dart';
 import 'package:pecs_new_arch/features/home/presentation/screens/widgets/user_dropdown.dart';
 import 'package:pecs_new_arch/features/library/presentation/screens/categories.dart';
+import 'package:pecs_new_arch/initapp.dart';
 
 class HomeTopWidget extends StatefulWidget {
   const HomeTopWidget({super.key});
@@ -33,8 +34,8 @@ class _HomeTopWidgetState extends State<HomeTopWidget> {
                 _buildNavItem(context, 'Главная', HomeScreen()),
                 _buildNavItem(context, 'Наша платформа', AboutUs()),
                 _buildNavItem(context, 'О нас', AboutUs()),
-                _buildNavItem(context, 'Доска', BoardsScreen()),
-                _buildNavItem(context, 'Библиотека', Categories()),
+                _buildNavItem(context, 'Доска', BoardsScreen(navigatorKey: navigatorKey,)),
+                _buildNavItem(context, 'Библиотека', Categories(navigatorKey: navigatorKey,)),
                 _buildNavItem(context, 'Контакты', AboutUs()),
                 Expanded(
                     child: UserDropdown(

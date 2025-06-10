@@ -20,6 +20,7 @@ import '../widgets/bottom_board.dart';
 
 class BoardScreen extends StatefulWidget {
   final String boardId;
+  
   const BoardScreen({required this.boardId, super.key});
 
   @override
@@ -99,7 +100,6 @@ class _BoardScreenState extends State<BoardScreen> {
             backgroundColor: AppColors.white,
             body: Column(
               children: [
-                const HomeTopWidget(),
                 BlocBuilder<BoardBloc, BoardState>(
                   builder: (context, state) {
                     if (state is BoardLoading) {
