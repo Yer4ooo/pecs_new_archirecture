@@ -16,7 +16,7 @@ class LoginApiService {
         parser: (response) {
           GetIt.I<KeyValueStorageService>().setUserData(loginResponseModelToJson(LoginResponseModel.fromJson(response)));
           GetIt.I<KeyValueStorageService>().setAccessToken(response['access']);
-          GetIt.I<KeyValueStorageService>().setAccessToken(response['user_role']);
+          GetIt.I<KeyValueStorageService>().setUserRole(response['user_role']);
           return LoginResponseModel.fromJson(response);
         },
       );

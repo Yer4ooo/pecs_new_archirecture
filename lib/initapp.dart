@@ -11,6 +11,7 @@ import 'package:pecs_new_arch/core/components/left_nav_bar.dart';
 import 'package:pecs_new_arch/core/theme/app_theme.dart';
 import 'package:pecs_new_arch/core/utils/key_value_storage_service.dart';
 import 'package:pecs_new_arch/features/board/logic/bloc/board_bloc.dart';
+import 'package:pecs_new_arch/features/children/logic/bloc/children_bloc.dart';
 import 'package:pecs_new_arch/features/home/presentation/screens/home_screen.dart';
 import 'package:pecs_new_arch/features/library/presentation/bloc/library_bloc.dart';
 import 'package:pecs_new_arch/features/profile/presentation/screens/profile_screen.dart';
@@ -36,6 +37,7 @@ Future<void> initApp() async {
         BlocProvider(create: (_) => sl<LibraryBloc>()),
         BlocProvider(create: (_) => sl<BoardBloc>()),
 
+        BlocProvider(create: (_) => sl<ChildrenBloc>()),
 
 
 

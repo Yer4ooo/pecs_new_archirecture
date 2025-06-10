@@ -70,6 +70,7 @@ flutter:
     - assets/translations/
     - assets/jpg/
     - assets/icons/svg/
+    - assets/images/
 
 
   fonts:
