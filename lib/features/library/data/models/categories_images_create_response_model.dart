@@ -1,33 +1,39 @@
 import 'dart:convert';
 
-CateoriesImagesCreateResponseModel cateoriesImagesCreateResponseModelFromJson(String str) => CateoriesImagesCreateResponseModel.fromJson(json.decode(str));
+CategoriesImagesCreateResponseModel categoriesImagesCreateResponseModelFromJson(
+        String str) =>
+    CategoriesImagesCreateResponseModel.fromJson(json.decode(str));
 
-String cateoriesImagesCreateResponseModelToJson(CateoriesImagesCreateResponseModel data) => json.encode(data.toJson());
+String categoriesImagesCreateResponseModelToJson(
+        CategoriesImagesCreateResponseModel data) =>
+    json.encode(data.toJson());
 
-class CateoriesImagesCreateResponseModel {
-    int id;
-    String name;
-    String imageUrl;
-    int categoryId;
+class CategoriesImagesCreateResponseModel {
+  int id;
+  String name;
+  String imageUrl;
+  int categoryId;
 
-    CateoriesImagesCreateResponseModel({
-        required this.id,
-        required this.name,
-        required this.imageUrl,
-        required this.categoryId,
-    });
+  CategoriesImagesCreateResponseModel({
+    required this.id,
+    required this.name,
+    required this.imageUrl,
+    required this.categoryId,
+  });
 
-    factory CateoriesImagesCreateResponseModel.fromJson(Map<String, dynamic> json) => CateoriesImagesCreateResponseModel(
+  factory CategoriesImagesCreateResponseModel.fromJson(
+          Map<String, dynamic> json) =>
+      CategoriesImagesCreateResponseModel(
         id: json["id"],
         name: json["name"],
         imageUrl: json["imageUrl"],
         categoryId: json["categoryId"],
-    );
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
         "imageUrl": imageUrl,
         "categoryId": categoryId,
-    };
+      };
 }

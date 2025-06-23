@@ -1,10 +1,17 @@
-import 'package:flutter/cupertino.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dio/dio.dart';
-import 'package:pecs_new_arch/features/registration/data/models/signup_request_model.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:pecs_new_arch/core/constants/app_colors.dart';
 import 'package:pecs_new_arch/features/registration/presentation/bloc/registration_bloc.dart';
-import 'package:pecs_new_arch/features/start/presentation/start_page.dart'; // Import Dio
+import 'package:pecs_new_arch/features/registration/presentation/screens/widgets/organization_registration_form.dart';
+import 'package:pecs_new_arch/features/registration/presentation/screens/widgets/parent_registration_form.dart';
+import 'package:pecs_new_arch/features/registration/presentation/screens/widgets/specialist_registration_form.dart';
+import 'package:pecs_new_arch/features/start/presentation/start_page.dart';
+import 'package:pecs_new_arch/features/start/presentation/widgets/logo_part_screen.dart'; // Import Dio
+
+enum UserRole { parent, organization, specialist }
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -34,16 +41,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   void _validateFields() {
     setState(() {
-      _firstnameError = _firstnameController.text.isEmpty ? 'Имя обязательно для заполнения' : null;
-      _surnameError = _surnameController.text.isEmpty ? 'Фамилия обязательно для заполнения' : null;
-      _usernameError = _usernameController.text.isEmpty ? 'Имя пользователя обязательно для заполнения' : null;
+      _firstnameError = _firstnameController.text.isEmpty
+          ? 'Имя обязательно для заполнения'
+          : null;
+      _surnameError = _surnameController.text.isEmpty
+          ? 'Фамилия обязательно для заполнения'
+          : null;
+      _usernameError = _usernameController.text.isEmpty
+          ? 'Имя пользователя обязательно для заполнения'
+          : null;
 
       final emailPattern = r'^[^@]+@[^@]+\.[^@]+';
-      _emailError =
-          !_emailController.text.contains(RegExp(emailPattern)) ? 'Введите корректный электронный адрес' : null;
+      _emailError = !_emailController.text.contains(RegExp(emailPattern))
+          ? 'Введите корректный электронный адрес'
+          : null;
 
-      if (_passwordController.text.length < 6 && _passwordController.text != _againPasswordController.text) {
-        _passwordError = 'Пароль должен содержать минимум 6 символов и совпадать с повторным паролем';
+      if (_passwordController.text.length < 6 &&
+          _passwordController.text != _againPasswordController.text) {
+        _passwordError =
+            'Пароль должен содержать минимум 6 символов и совпадать с повторным паролем';
       } else if (_passwordController.text.length < 6) {
         _passwordError = 'Пароль должен содержать минимум 6 символов';
       } else if (_passwordController.text != _againPasswordController.text) {
@@ -56,232 +72,206 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     });
   }
 
+  UserRole selectedRole = UserRole.parent;
   @override
   Widget build(BuildContext context) {
+    final locale = context.locale;
+
     return BlocProvider(
       create: (context) => RegistrationBloc(), // Provide the SignUpBloc
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: const Color.fromRGBO(246, 250, 245, 1),
-        body: SingleChildScrollView(
-          child: SafeArea(
-            child: BlocConsumer<RegistrationBloc, RegistrationState>(
-              listener: (context, state) {
-                if (state is RegistrationLoading) {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (context) => const Center(child: CircularProgressIndicator()),
-                  );
-                } else if (state is RegistrationSuccess) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Регистрация прошла успешно!')),
-                  );
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const StartPage()));
-                } else if (state is RegistrationFailure) {
-                  Navigator.of(context).pop(); // Remove loading dialog
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(state.message.message)),
-                  );
-                }
-              },
-              builder: (context, state) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 80,
-                          width: 140,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(width: 2),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Image.asset(
-                              'assets/jpg/logo.jpg',
-                              height: 100,
-                              width: 120,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          height: 580,
-                          width: 450,
-                          decoration: BoxDecoration(
-                            color: const Color.fromRGBO(255, 255, 255, 1),
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(
-                              color: const Color.fromRGBO(102, 102, 102, 1),
-                              width: 2,
-                            ),
-                          ),
+        body: SafeArea(
+          child: BlocConsumer<RegistrationBloc, RegistrationState>(
+            listener: (context, state) {
+              if (state is RegistrationLoading) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) =>
+                      const Center(child: CircularProgressIndicator()),
+                );
+              } else if (state is RegistrationSuccess) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Регистрация прошла успешно!')),
+                );
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const StartPage()));
+              } else if (state is RegistrationFailure) {
+                Navigator.of(context).pop(); // Remove loading dialog
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message.message)),
+                );
+              }
+            },
+            builder: (context, state) {
+              return Padding(
+                padding: EdgeInsets.only(
+                    left: 25.h, top: 25.w, right: 40.w, bottom: 25.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(flex: 2, child: WelcomeLeftPanel()),
+                    Expanded(
+                        flex: 3,
+                        child: SingleChildScrollView(
                           child: Column(
                             children: [
-                              const SizedBox(height: 10),
-                              const Text(
-                                'Регистрация',
-                                style: TextStyle(fontSize: 24, fontFamily: 'Montserrat'),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: Colors.grey.shade300),
+                                      borderRadius: BorderRadius.circular(8.r),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 12.w, vertical: 6.h),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<Locale>(
+                                        value: locale,
+                                        icon: const Icon(Icons.arrow_drop_down,
+                                            color: Colors.grey),
+                                        items: [
+                                          DropdownMenuItem(
+                                            value: const Locale('ru'),
+                                            child: Text("РУС",
+                                                style: GoogleFonts.inter(
+                                                    fontSize: 10.sp,
+                                                    color: AppColors.black,
+                                                    fontWeight:
+                                                        FontWeight.w400)),
+                                          ),
+                                          DropdownMenuItem(
+                                            value: const Locale('kk'),
+                                            child: Text("ҚАЗ",
+                                                style: GoogleFonts.inter(
+                                                    fontSize: 10.sp,
+                                                    color: AppColors.black,
+                                                    fontWeight:
+                                                        FontWeight.w400)),
+                                          ),
+                                        ],
+                                        onChanged: (Locale? newLocale) {
+                                          if (newLocale != null) {
+                                            context.setLocale(newLocale);
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 10),
+                              40.verticalSpace,
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: 101.w),
                                 child: Column(
                                   children: [
-                                    TextField(
-                                      controller: _firstnameController,
-                                      decoration: InputDecoration(
-                                        hintText: 'Имя',
-                                        
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        errorText: _firstnameError,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    TextField(
-                                      controller: _surnameController,
-                                      decoration: InputDecoration(
-                                        hintText: 'Фамилия',
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        errorText: _surnameError,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    TextField(
-                                      controller: _usernameController,
-                                      decoration: InputDecoration(
-                                        hintText: 'Имя пользователя',
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        errorText: _usernameError,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    TextField(
-                                      controller: _emailController,
-                                      decoration: InputDecoration(
-                                        hintText: 'Электронный адрес',
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        errorText: _emailError,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-
-                                    /// Dropdown for Role Selection
-                                    DropdownButtonFormField<String>(
-                                      value: _selectedRole,
-                                      decoration: InputDecoration(
-                                        hintText: 'Выберите роль',
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        errorText: _roleError,
-                                      ),
-                                      items: const [
-                                        DropdownMenuItem(
-                                          value: 'cg_role',
-                                          child: Text('Опекун'),
-                                        ),
-                                        DropdownMenuItem(
-                                          value: 'cr_role',
-                                          child: Text('Пациент'),
-                                        ),
-                                      ],
-                                      onChanged: (value) {
+                                    Text("Создать аккаунт",
+                                        style: GoogleFonts.inter(
+                                            fontSize: 20.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.black)),
+                                    20.verticalSpace,
+                                    SegmentedTabBar(
+                                      selectedRole: selectedRole,
+                                      onChanged: (role) {
                                         setState(() {
-                                          _selectedRole = value;
+                                          selectedRole = role;
                                         });
                                       },
                                     ),
-
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: TextField(
-                                            controller: _passwordController,
-                                            decoration: InputDecoration(
-                                              hintText: 'Пароль',
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              errorText: _passwordError,
-                                            ),
-                                            obscureText: !_showPasswords,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: TextField(
-                                            controller: _againPasswordController,
-                                            decoration: InputDecoration(
-                                              hintText: 'Повторите пароль',
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              errorText: _againPasswordError,
-                                            ),
-                                            obscureText: !_showPasswords,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Checkbox(
-                                          value: _showPasswords,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              _showPasswords = value!;
-                                            });
-                                          },
-                                        ),
-                                        const Text("Показать"),
-                                      ],
+                                    30.verticalSpace,
+                                    Builder(
+                                      builder: (context) {
+                                        switch (selectedRole) {
+                                          case UserRole.parent:
+                                            return const ParentRegistrationForm();
+                                          case UserRole.organization:
+                                            return const OrganizationRegistrationForm();
+                                          case UserRole.specialist:
+                                            return const SpecialistRegistrationForm();
+                                        }
+                                      },
                                     ),
                                   ],
                                 ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  _validateFields();
-                                  if (_firstnameError == null &&
-                                      _surnameError == null &&
-                                      _usernameError == null &&
-                                      _emailError == null &&
-                                      _passwordError == null) {
-                                    context.read<RegistrationBloc>().add(RegisterUser(
-                                          user: SignupRequestModel(
-                                              username: _usernameController.text,
-                                              password: _passwordController.text,
-                                              email: _emailController.text,
-                                              firstName: _firstnameController.text,
-                                              lastName: _surnameController.text,
-                                              role: _selectedRole!),
-                                        ));
-                                  }
-                                },
-                                child: const Text('Создать аккаунт'),
-                              ),
+                              )
                             ],
                           ),
-                        ),
-                      ],
+                        ))
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SegmentedTabBar extends StatelessWidget {
+  final UserRole selectedRole;
+  final Function(UserRole) onChanged;
+
+  const SegmentedTabBar({
+    super.key,
+    required this.selectedRole,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 5.h),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFEFEF),
+        borderRadius: BorderRadius.circular(9.r),
+      ),
+      child: Row(
+        children: [
+          _buildTab(UserRole.parent, "Родитель", isFirst: true),
+          _buildTab(UserRole.organization, "Организация"),
+          _buildTab(UserRole.specialist, "Специалист", isLast: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTab(UserRole role, String label,
+      {bool isFirst = false, bool isLast = false}) {
+    final bool isSelected = selectedRole == role;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => onChanged(role),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(7.r),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
-                  ),
-                );
-              },
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 14.sp,
+              fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+              color: Colors.black,
             ),
           ),
         ),

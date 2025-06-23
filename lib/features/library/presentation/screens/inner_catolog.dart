@@ -1,14 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dio/dio.dart';
-import 'package:pecs_new_arch/features/home/presentation/screens/widgets/home_top_widget.dart';
 import 'package:pecs_new_arch/features/library/data/models/categories_images_list_model.dart';
 import 'package:pecs_new_arch/features/library/presentation/bloc/library_bloc.dart';
 import 'package:pecs_new_arch/features/library/presentation/widgets/category_card.dart';
 import 'package:pecs_new_arch/features/library/presentation/widgets/custom_button.dart';
 import 'package:pecs_new_arch/injection_container.dart';
-
 
 class InnerCatolog extends StatefulWidget {
   final int? id;
@@ -26,69 +22,78 @@ class _InnerCatologState extends State<InnerCatolog> {
     {
       'id': 1,
       'name': 'Лев',
-      'imageUrl': 'https://cdn.pixabay.com/photo/2017/10/25/16/54/african-lion-2888519_640.jpg',
+      'imageUrl':
+          'https://cdn.pixabay.com/photo/2017/10/25/16/54/african-lion-2888519_640.jpg',
       'isMy': false
     },
     {
       'id': 2,
       'name': 'Жираф ',
-      'imageUrl': 'https://cdn.pixabay.com/photo/2023/06/03/17/11/giraffe-8038107_640.jpg',
+      'imageUrl':
+          'https://cdn.pixabay.com/photo/2023/06/03/17/11/giraffe-8038107_640.jpg',
       'isMy': false
     },
     {
       'id': 3,
       'name': 'Зебра',
-      'imageUrl': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAheYsrTCldWDhGR3aKktvMF1_nEe5yffEQQ&s',
+      'imageUrl':
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAheYsrTCldWDhGR3aKktvMF1_nEe5yffEQQ&s',
       'isMy': true
     },
     {
       'id': 4,
       'name': 'Слон',
-      'imageUrl': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbg204zYIE1oiXZYVOuBPmsw_UpVA40fMCRA&s',
+      'imageUrl':
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbg204zYIE1oiXZYVOuBPmsw_UpVA40fMCRA&s',
       'isMy': true
     },
     {
       'id': 5,
       'name': 'Гиена',
-      'imageUrl': 'https://cdn.pixabay.com/photo/2022/05/25/07/23/animal-7219905_640.jpg',
+      'imageUrl':
+          'https://cdn.pixabay.com/photo/2022/05/25/07/23/animal-7219905_640.jpg',
       'isMy': true
     },
   ];
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<LibraryBloc>()..add(GetCategoryImagesById(id:widget.id)),
+      create: (context) =>
+          sl<LibraryBloc>()..add(GetCategoryImagesById(id: widget.id)),
       child: Scaffold(
         body: BlocBuilder<LibraryBloc, LibraryState>(builder: (context, state) {
           if (state is CategoriesLoading) {
             return const Column(
               children: [
-                HomeTopWidget(),
                 Center(
                   child: CircularProgressIndicator(),
                 ),
               ],
             );
           } else if (state is CategoryImagesLoaded) {
-            List<CateoriesImagesListModel>? filteredImages = state.images?.where((image) {
+            List<CategoriesImagesListModel>? filteredImages =
+                state.images?.where((image) {
               // Check for null before using 'public'
               if (_showMyCards && (image.public != true)) return false;
 
               // Check if name is not null before using 'contains'
               if (_searchQuery.isNotEmpty &&
-                  !(image.name?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false)) {
+                  !(image.name
+                          ?.toLowerCase()
+                          .contains(_searchQuery.toLowerCase()) ??
+                      false)) {
                 return false;
               }
 
               return true;
-}).toList(); // convert Iterable to List
+            }).toList(); // convert Iterable to List
 
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  HomeTopWidget(),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 16.0),
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
@@ -130,7 +135,8 @@ class _InnerCatologState extends State<InnerCatolog> {
                                     _searchController.clear();
                                   });
                                 },
-                                child: const Icon(Icons.clear, color: Colors.grey),
+                                child:
+                                    const Icon(Icons.clear, color: Colors.grey),
                               ),
                           ],
                         ),
@@ -151,7 +157,10 @@ class _InnerCatologState extends State<InnerCatolog> {
                           color: const Color.fromRGBO(97, 148, 81, 1),
                           width: 200,
                           height: 45,
-                          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                          textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         const SizedBox(width: 20),
@@ -165,7 +174,10 @@ class _InnerCatologState extends State<InnerCatolog> {
                           color: Colors.grey,
                           width: 200,
                           height: 45,
-                          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                          textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         const SizedBox(width: 20),
@@ -175,7 +187,10 @@ class _InnerCatologState extends State<InnerCatolog> {
                           color: Colors.grey,
                           width: 200,
                           height: 45,
-                          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                          textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white),
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ],
@@ -186,7 +201,8 @@ class _InnerCatologState extends State<InnerCatolog> {
                     child: GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4, // 4 cards in a row
                         crossAxisSpacing: 8.0,
                         mainAxisSpacing: 8.0,

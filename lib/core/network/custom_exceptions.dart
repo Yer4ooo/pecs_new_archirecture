@@ -82,7 +82,8 @@ class CustomException implements Exception {
             return CustomException(
               exceptionType: ExceptionType.connectionException,
               statusCode: error.response?.statusCode,
-              message: 'Caused for example by a `xhr.onError` or SocketExceptions.',
+              message:
+                  'Caused for example by a `xhr.onError` or SocketExceptions.',
             );
           case DioExceptionType.cancel:
             return CustomException(
@@ -109,7 +110,8 @@ class CustomException implements Exception {
               message: 'Failed to receive',
             );
           case DioExceptionType.unknown:
-            if (error.message?.contains(ExceptionType.socketException.name) ?? false) {
+            if (error.message?.contains(ExceptionType.socketException.name) ??
+                false) {
               return CustomException(
                 exceptionType: ExceptionType.fetchDataException,
                 statusCode: error.response?.statusCode,
@@ -124,7 +126,8 @@ class CustomException implements Exception {
               );
             }
             final name = error.response?.data['headers']['code'] as String;
-            final message = error.response?.data['headers']['message'] as String;
+            final message =
+                error.response?.data['headers']['message'] as String;
             if (name == ExceptionType.tokenExpiredException.name) {
               return CustomException(
                 exceptionType: ExceptionType.tokenExpiredException,

@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pecs_new_arch/features/home/presentation/screens/home_screen.dart';
-import 'package:pecs_new_arch/features/login/data/models/login_request_model.dart';
-import 'package:pecs_new_arch/features/login/presentation/bloc/login_bloc.dart';
+import 'package:pecs_new_arch/features/start/data/models/login_request_model.dart';
+import 'package:pecs_new_arch/features/start/presentation/bloc/login_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: Color.fromRGBO(246, 250, 245, 1),
       body: SafeArea(
         child: Padding(
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Login Form
                     Container(
                       height: 330,
-                      width: 450,
+                      width: 500,
                       decoration: BoxDecoration(
                         color: const Color.fromRGBO(255, 255, 255, 1),
                         borderRadius: BorderRadius.circular(15),
@@ -65,10 +65,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: BlocConsumer<LoginBloc, LoginState>(
                         listener: (context, state) {
                           if (state is LoginSuccess) {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => HomeScreen()));
                           } else if (state is LoginFailure) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Error: ${state.message.message}")),
+                              SnackBar(
+                                  content:
+                                      Text("Error: ${state.message.message}")),
                             );
                           }
                         },
@@ -91,7 +96,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(height: 20),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
                                 child: TextField(
                                   controller: _usernameController,
                                   decoration: InputDecoration(
@@ -108,7 +114,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(height: 10),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
                                 child: TextField(
                                   controller: _passwordController,
                                   decoration: InputDecoration(
@@ -135,7 +142,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                     context.read<LoginBloc>().add(
                                           Login(
-                                            user: LoginRequestModel(username: username, password: password),
+                                            user: LoginRequestModel(
+                                                identifier: username,
+                                                password: password),
                                           ),
                                         );
                                   },

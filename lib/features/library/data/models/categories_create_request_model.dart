@@ -1,9 +1,10 @@
 import 'dart:convert';
 
-CategoriesCreateRequestModel CategoriesCreateRequestModelFromJson(String str) =>
+CategoriesCreateRequestModel categoriesCreateRequestModelFromJson(String str) =>
     CategoriesCreateRequestModel.fromJson(json.decode(str));
 
-String CategoriesCreateRequestModelToJson(CategoriesCreateRequestModel data) => json.encode(data.toJson());
+String categoriesCreateRequestModelToJson(CategoriesCreateRequestModel data) =>
+    json.encode(data.toJson());
 
 class CategoriesCreateRequestModel {
   String name;
@@ -14,7 +15,8 @@ class CategoriesCreateRequestModel {
     required this.imageUrl,
   });
 
-  factory CategoriesCreateRequestModel.fromJson(Map<String, dynamic> json) => CategoriesCreateRequestModel(
+  factory CategoriesCreateRequestModel.fromJson(Map<String, dynamic> json) =>
+      CategoriesCreateRequestModel(
         name: json["name"],
         imageUrl: json["image_url"],
       );

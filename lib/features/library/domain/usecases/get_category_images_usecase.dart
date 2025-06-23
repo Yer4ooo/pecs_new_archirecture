@@ -4,13 +4,14 @@ import 'package:pecs_new_arch/features/library/domain/repository/library_reposit
 
 import '../../../../core/usecase/usecase.dart';
 
-class GetCategoryImagesUsecase implements UseCase<DataState<List<CateoriesImagesListModel>?>, int?> {
+class GetCategoryImagesUsecase
+    implements UseCase<DataState<List<CategoriesImagesListModel>?>, int?> {
   final LibraryRepository _libraryRepository;
 
   GetCategoryImagesUsecase(this._libraryRepository);
 
   @override
-  Future<DataState<List<CateoriesImagesListModel>?>> call({ params}) async {
+  Future<DataState<List<CategoriesImagesListModel>?>> call({params}) async {
     return await _libraryRepository.getCategoryImagesById(id: params);
   }
 }

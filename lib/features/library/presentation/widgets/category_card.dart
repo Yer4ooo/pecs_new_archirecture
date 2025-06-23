@@ -31,7 +31,7 @@ class CategoryCard extends StatelessWidget {
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
                 ),
-                child: (imageUrl == null || imageUrl.isEmpty)
+                child: (imageUrl.isEmpty)
                     ? Container(
                         color: Colors.grey[300], // Light gray background
                         alignment: Alignment.center,

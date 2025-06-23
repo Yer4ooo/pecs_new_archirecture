@@ -5,13 +5,16 @@ import '../../../../core/resources/data_state.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../repository/library_repository.dart';
 
-class CreateImageUsecase implements UseCase<DataState<CateoriesImagesCreateResponseModel>, CateoriesImagesCreateRequestModel?> {
+class CreateImageUsecase
+    implements
+        UseCase<DataState<CategoriesImagesCreateResponseModel>,
+            CategoriesImagesCreateRequestModel?> {
   final LibraryRepository _libraryRepository;
 
   CreateImageUsecase(this._libraryRepository);
 
   @override
-  Future<DataState<CateoriesImagesCreateResponseModel>> call({params}) async {
+  Future<DataState<CategoriesImagesCreateResponseModel>> call({params}) async {
     return await _libraryRepository.createImage(image: params);
   }
 }

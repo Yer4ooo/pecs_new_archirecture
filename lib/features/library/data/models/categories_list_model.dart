@@ -1,73 +1,139 @@
-import 'dart:convert';
+class CategoriesListModel {
+  final int count;
+  final String? next;
+  final String? prev;
+  final List<CategoryItem> items;
 
-CateoriesListModel cateoriesListModelFromJson(String str) => CateoriesListModel.fromJson(json.decode(str));
-
-String cateoriesListModelToJson(CateoriesListModel data) => json.encode(data.toJson());
-
-class CateoriesListModel {
-  int? id;
-  String? name;
-  String? image;
-  bool? public;
-  int? creator;
-  String? creatorName;
-  String? imageUrl;
-  DateTime? createdAt;
-
-  CateoriesListModel({
-    this.id,
-    this.name,
-    this.image,
-    this.public,
-    this.creator,
-    this.creatorName,
-    this.imageUrl,
-    this.createdAt,
+  CategoriesListModel({
+    required this.count,
+    this.next,
+    this.prev,
+    required this.items,
   });
 
-  CateoriesListModel copyWith({
-    int? id,
-    String? name,
-    String? image,
-    bool? public,
-    int? creator,
-    String? creatorName,
-    String? imageUrl,
-    DateTime? createdAt,
-  }) => CateoriesListModel(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        image: image ?? this.image,
-        public: public ?? this.public,
-        creator: creator ?? this.creator,
-        creatorName: creatorName ?? this.creatorName,
-        imageUrl: imageUrl ?? this.imageUrl,
-        createdAt: createdAt ?? this.createdAt,
-      );
-
-  factory CateoriesListModel.fromJson(Map<String, dynamic> json) => CateoriesListModel(
-        id: json["id"],
-        name: json["name"],
-        image: json["image"],
-        public: json["public"],
-        creator: json["creator"],
-        creatorName: json["creator_name"],
-        imageUrl: json["image_url"],
-        createdAt: json["created_at"] != null ? DateTime.tryParse(json["created_at"]) : null,
-      );
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "image": image,
-        "public": public,
-        "creator": creator,
-        "creator_name": creatorName,
-        "image_url": imageUrl,
-        "created_at": createdAt?.toIso8601String(),
-      };
-                static List<CateoriesListModel> fromList(List? list) {
-    if (list == null) return [];
-    return list.map((e) => CateoriesListModel.fromJson(e)).toList();
+  factory CategoriesListModel.fromJson(Map<String, dynamic> json) {
+    return CategoriesListModel(
+      count: json['count'] ?? 0,
+      next: json['next'],
+      prev: json['prev'],
+      items: (json['items'] as List<dynamic>? ?? [])
+          .map((item) => CategoryItem.fromJson(item))
+          .toList(),
+    );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'count': count,
+      'next': next,
+      'prev': prev,
+      'items': items.map((item) => item.toJson()).toList(),
+    };
+  }
+}
+
+// Category item model
+class CategoryItem {
+  final int id;
+  final String name;
+  final bool public;
+  final bool verified;
+  final String nameEn;
+  final String nameRu;
+  final String nameKk;
+  final String? translationModel;
+  final int creator;
+  final String creatorFirstName;
+  final String creatorLastName;
+  final String imageUrl;
+  final DateTime createdAt;
+
+  CategoryItem({
+    required this.id,
+    required this.name,
+    required this.public,
+    required this.verified,
+    required this.nameEn,
+    required this.nameRu,
+    required this.nameKk,
+    this.translationModel,
+    required this.creator,
+    required this.creatorFirstName,
+    required this.creatorLastName,
+    required this.imageUrl,
+    required this.createdAt,
+  });
+
+  factory CategoryItem.fromJson(Map<String, dynamic> json) {
+    return CategoryItem(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      public: json['public'] ?? false,
+      verified: json['verified'] ?? false,
+      nameEn: json['name_en'] ?? '',
+      nameRu: json['name_ru'] ?? '',
+      nameKk: json['name_kk'] ?? '',
+      translationModel: json['translation_model'],
+      creator: json['creator'] ?? 0,
+      creatorFirstName: json['creator_first_name'] ?? '',
+      creatorLastName: json['creator_last_name'] ?? '',
+      imageUrl: json['image_url'] ?? '',
+      createdAt: DateTime.parse(
+          json['created_at'] ?? DateTime.now().toIso8601String()),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'public': public,
+      'verified': verified,
+      'name_en': nameEn,
+      'name_ru': nameRu,
+      'name_kk': nameKk,
+      'translation_model': translationModel,
+      'creator': creator,
+      'creator_first_name': creatorFirstName,
+      'creator_last_name': creatorLastName,
+      'image_url': imageUrl,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
+}
+
+extension CategoriesGlobalModelExtension on CategoriesListModel {
+  bool get hasNextPage => next != null;
+  bool get hasPrevPage => prev != null;
+
+  List<String> getLocalizedNames(String locale) {
+    return items.map((item) {
+      switch (locale) {
+        case 'ru':
+          return item.nameRu;
+        case 'kk':
+          return item.nameKk;
+        case 'en':
+        default:
+          return item.nameEn;
+      }
+    }).toList();
+  }
+}
+
+// Extension for CategoryItem
+extension CategoryItemExtension on CategoryItem {
+  String getLocalizedName(String locale) {
+    switch (locale) {
+      case 'ru':
+        return nameRu;
+      case 'kk':
+        return nameKk;
+      case 'en':
+      default:
+        return nameEn;
+    }
+  }
+
+  String get creatorFullName => '$creatorFirstName $creatorLastName';
 }

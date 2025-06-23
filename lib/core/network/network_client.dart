@@ -1,59 +1,23 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:get_it/get_it.dart';
 import 'package:pecs_new_arch/core/network/api_endpoints.dart';
 import 'package:pecs_new_arch/core/network/custom_exceptions.dart';
-
-
-// Services
+import 'package:pecs_new_arch/core/utils/key_value_storage_service.dart';
 import './dio_service.dart';
 
-/// A base class containing methods for basic API functionality.
-///
-/// Should be implemented by any service class that wishes to interact
-/// with an API.
 abstract class NetworkClientInterface {
-  /// Abstract const constructor. This constructor enables subclasses
-  /// to provide const constructors so that they can be used in
-  /// const expressions.
   const NetworkClientInterface();
-
-  /// Base method for requesting a document of data from the [endpoint].
-  ///
-  /// The response is deserialized into a single model objects of type [T],
-  /// using the [parser] callback.
-  ///
-  /// [queryParams] holds any query parameters for the request.
-  ///
-  /// [cancelToken] is used to cancel the request pre-maturely. If null,
-  /// the **default** [cancelToken] inside [DioService] is used.
-  ///
-  /// [requiresAuthToken] is used to decide if a token will be inserted
-  /// in the **headers** of the request using an [ApiInterceptor]
   Future<T> getData<T>({
     required String endpoint,
-    Map<String, dynamic>? queryParams,
     CancelToken? cancelToken,
+    Map<String, dynamic>? queryParams,
     bool requiresAuthToken = true,
     required T Function(Map<String, dynamic> responseBody) parser,
   });
-
-  /// An implementation of the base method for requesting collection of data
-  /// from the [endpoint].
-  /// The response body must be a [List], else the [converter] fails.
-  ///
-  /// The [converter] callback is used to **deserialize** the response body
-  /// into a [List] of objects of type [T].
-  /// The callback is executed on each member of the response `body` List.
-  /// [T] is usually set to a `Model`.
-  ///
-  /// [queryParams] holds any query parameters for the request.
-  ///
-  /// [cancelToken] is used to cancel the request pre-maturely. If null,
-  /// the **default** [cancelToken] inside [DioService] is used.
-  ///
-  /// [requiresAuthToken] is used to decide if a token will be inserted
-  /// in the **headers** of the request using an [ApiInterceptor].
-  /// The default value is `true`.
   Future<List<T>> getListData<T>({
     required String endpoint,
     Map<String, dynamic>? queryParams,
@@ -61,19 +25,6 @@ abstract class NetworkClientInterface {
     bool requiresAuthToken = true,
     required List<T> Function(List<dynamic> responseBody) parser,
   });
-
-  /// Base method for inserting [body] at the [endpoint].
-  ///
-  /// The [body] contains body for the request.
-  ///
-  /// The response is deserialized into an object of type [T],
-  /// using the [parser] callback.
-  ///
-  /// [cancelToken] is used to cancel the request pre-maturely. If null,
-  /// the **default** [cancelToken] inside [DioService] is used.
-  ///
-  /// [requiresAuthToken] is used to decide if a token will be inserted
-  /// in the **headers** of the request using an [ApiInterceptor]
   Future<T?> postData<T>({
     required String endpoint,
     required Map<String, dynamic> body,
@@ -81,19 +32,6 @@ abstract class NetworkClientInterface {
     bool requiresAuthToken = true,
     required T Function(Map<String, dynamic> response) parser,
   });
-
-  /// Base method for updating [data] at the [endpoint].
-  ///
-  /// The response is deserialized into an object of type [T],
-  /// using the [parser] callback.
-  ///
-  /// The [data] contains body for the request.
-  ///
-  /// [cancelToken] is used to cancel the request pre-maturely. If null,
-  /// the **default** [cancelToken] inside [DioService] is used.
-  ///
-  /// [requiresAuthToken] is used to decide if a token will be inserted
-  /// in the **headers** of the request using an [ApiInterceptor]
   Future<T?> updateData<T>({
     required String endpoint,
     required Map<String, dynamic> body,
@@ -101,19 +39,6 @@ abstract class NetworkClientInterface {
     bool requiresAuthToken = true,
     required T Function(Map<String, dynamic> response) parser,
   });
-
-  /// Base method for deleting [data] at the [endpoint].
-  ///
-  /// The response is deserialized into an object of type [T],
-  /// using the [parser] callback.
-  ///
-  /// The [data] contains body for the request.
-  ///
-  /// [cancelToken] is used to cancel the request pre-maturely. If null,
-  /// the **default** [cancelToken] inside [DioService] is used.
-  ///
-  /// [requiresAuthToken] is used to decide if a token will be inserted
-  /// in the **headers** of the request using an [ApiInterceptor]
   Future<T?> deleteData<T>({
     required String endpoint,
     Map<String, dynamic>? body,
@@ -121,11 +46,6 @@ abstract class NetworkClientInterface {
     bool requiresAuthToken = true,
     required T Function(Map<String, dynamic> response)? parser,
   });
-
-  /// Base method for cancelling requests pre-maturely
-  /// using the [cancelToken].
-  ///
-  /// If null, the **default** [cancelToken] inside [DioService] is used.
   void cancelRequests({CancelToken? cancelToken});
 }
 
@@ -136,9 +56,9 @@ class NetworkClient implements NetworkClientInterface {
   @override
   Future<T> getData<T>({
     required String endpoint,
-    Map<String, dynamic>? queryParams,
     CancelToken? cancelToken,
     CachePolicy? cachePolicy,
+    Map<String, dynamic>? queryParams,
     int? cacheAgeDays,
     bool requiresAuthToken = true,
     required T Function(Map<String, dynamic> response) parser,
@@ -167,8 +87,6 @@ class NetworkClient implements NetworkClientInterface {
     } on Exception catch (ex) {
       throw CustomException.fromDioException(ex);
     }
-
-    // deserialize the response
     try {
       return parser(data);
     } on Exception catch (ex) {
@@ -222,6 +140,65 @@ class NetworkClient implements NetworkClientInterface {
     }
   }
 
+  Future<Uint8List?> postTtsDataIsolated({
+    required String endpoint,
+    required Map<String, dynamic> body,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final freshDio = Dio();
+      final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
+
+      final response = await freshDio.post(
+        ApiEndpoint.baseUrl + endpoint,
+        data: body,
+        options: Options(
+          responseType: ResponseType.bytes,
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json",
+          },
+          validateStatus: (status) => true,
+        ),
+        cancelToken: cancelToken,
+      );
+      if (response.statusCode == 200) {
+        if (response.data is Uint8List) {
+          return response.data as Uint8List;
+        } else {
+          throw Exception(
+              'Expected audio data but got ${response.data.runtimeType}');
+        }
+      } else {
+        String errorMessage = 'TTS API Error: ${response.statusCode}';
+        try {
+          if (response.data is Uint8List) {
+            final errorText = utf8.decode(response.data as Uint8List);
+            try {
+              final errorJson = json.decode(errorText);
+              if (errorJson is Map<String, dynamic> &&
+                  errorJson['message'] != null) {
+                errorMessage = errorJson['message'];
+              }
+            } catch (e) {
+              errorMessage = errorText;
+            }
+          }
+          // ignore: empty_catches
+        } catch (e) {}
+
+        throw Exception(errorMessage);
+      }
+    } catch (error) {
+      if (error is DioException) {
+        throw Exception('TTS Network Error: ${error.type} - ${error.message}');
+      } else {
+        // Re-throw non-Dio exceptions as-is
+        rethrow;
+      }
+    }
+  }
+
   @override
   Future<T?> postData<T>({
     required String endpoint,
@@ -238,7 +215,10 @@ class NetworkClient implements NetworkClientInterface {
       final response = await _dioService.post(
         endpoint: (baseurl ?? ApiEndpoint.baseUrl) + endpoint,
         data: body,
-        options: Options(extra: extra, responseType: ResponseType.json),
+        options: Options(
+            extra: extra,
+            responseType: ResponseType.json,
+            contentType: 'application/json'),
         cancelToken: cancelToken,
       );
 
@@ -262,7 +242,8 @@ class NetworkClient implements NetworkClientInterface {
     } catch (ex) {
       throw CustomException(
         exceptionType: ExceptionType.serializationException,
-        message: 'Failed to parse network response to model or vice versa for "${T.toString()}" model',
+        message:
+            'Failed to parse network response to model or vice versa for "${T.toString()}" model',
       );
     }
   }

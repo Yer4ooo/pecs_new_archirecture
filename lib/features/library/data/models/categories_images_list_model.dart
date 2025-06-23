@@ -1,13 +1,13 @@
 import 'dart:convert';
 
-List<CateoriesImagesListModel> cateoriesImagesListModelFromJson(String str) =>
-    List<CateoriesImagesListModel>.from(
-        json.decode(str).map((x) => CateoriesImagesListModel.fromJson(x)));
+List<CategoriesImagesListModel> categoriesImagesListModelFromJson(String str) =>
+    List<CategoriesImagesListModel>.from(
+        json.decode(str).map((x) => CategoriesImagesListModel.fromJson(x)));
 
-String cateoriesImagesListModelToJson(List<CateoriesImagesListModel> data) =>
+String categoriesImagesListModelToJson(List<CategoriesImagesListModel> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class CateoriesImagesListModel {
+class CategoriesImagesListModel {
   int? id;
   String? name;
   String? imageUrl;
@@ -16,7 +16,7 @@ class CateoriesImagesListModel {
   int? creatorId;
   String? creatorName;
 
-  CateoriesImagesListModel({
+  CategoriesImagesListModel({
     this.id,
     this.name,
     this.imageUrl,
@@ -26,8 +26,8 @@ class CateoriesImagesListModel {
     this.creatorName,
   });
 
-  factory CateoriesImagesListModel.fromJson(Map<String, dynamic> json) =>
-      CateoriesImagesListModel(
+  factory CategoriesImagesListModel.fromJson(Map<String, dynamic> json) =>
+      CategoriesImagesListModel(
         id: json["id"],
         name: json["name"],
         imageUrl: json["imageUrl"],
@@ -47,10 +47,8 @@ class CateoriesImagesListModel {
         "creator_name": creatorName,
       };
 
-  static List<CateoriesImagesListModel> fromList(List? list) {
+  static List<CategoriesImagesListModel> fromList(List? list) {
     if (list == null) return [];
-    return list
-        .map((e) => CateoriesImagesListModel.fromJson(e))
-        .toList();
+    return list.map((e) => CategoriesImagesListModel.fromJson(e)).toList();
   }
 }

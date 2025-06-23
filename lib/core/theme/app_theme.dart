@@ -113,14 +113,16 @@ ThemeData APP_THEME = ThemeData(
   ),
   checkboxTheme: CheckboxThemeData(
     fillColor: WidgetStateProperty.resolveWith((states) {
-      return states.any((element) => element == WidgetState.selected) ? Color(0xff3A7D44) : Colors.transparent;
+      return states.any((element) => element == WidgetState.selected)
+          ? Color(0xff3A7D44)
+          : Colors.transparent;
     }),
     side: BorderSide(
       color: Color(0xff3A7D44),
       width: 2.w,
     ),
   ),
-  tabBarTheme: TabBarTheme(
+  tabBarTheme: TabBarThemeData(
     indicatorSize: TabBarIndicatorSize.tab,
     dividerColor: Colors.transparent,
   ),

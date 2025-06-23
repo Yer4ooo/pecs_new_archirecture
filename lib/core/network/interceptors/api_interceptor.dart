@@ -1,20 +1,22 @@
-// ignore_for_file: unused_local_variable
-
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:math' as math;
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:pecs_new_arch/core/utils/key_value_storage_service.dart';
+import 'package:pecs_new_arch/features/start/presentation/start_page.dart';
+import 'package:pecs_new_arch/initapp.dart';
 import 'package:tuple/tuple.dart';
 
 class ApiInterceptor extends Interceptor {
   final bool enableEncryption;
   final bool enableDecryption;
 
-  ApiInterceptor({this.enableEncryption = false, this.enableDecryption = false}) : super();
+  ApiInterceptor({this.enableEncryption = false, this.enableDecryption = false})
+      : super();
 
   @override
   Future<void> onRequest(
@@ -65,8 +67,14 @@ class ApiInterceptor extends Interceptor {
   ) async {
     if (err.response?.statusCode == 401) {
       GetIt.I<KeyValueStorageService>().resetKeys();
-      // GetIt.I<GlobalAuthBloc>().add(GlobalAuthEvent.logOut());
     }
+    navigatorKey.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => StartPage(),
+      ),
+      (route) => false,
+    );
+
     return handler.next(err);
   }
 
@@ -77,10 +85,13 @@ class ApiInterceptor extends Interceptor {
       var keyndIV = deriveKeyAndIV(passphrase, salt);
       final key = encrypt.Key(keyndIV.item1);
       final iv = encrypt.IV(keyndIV.item2);
-      final encrypter = encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc, padding: "PKCS7"));
+      final encrypter = encrypt.Encrypter(
+          encrypt.AES(key, mode: encrypt.AESMode.cbc, padding: "PKCS7"));
       final encrypted = encrypter.encrypt(plainText, iv: iv);
       Uint8List encryptedBytesWithoutSalt = Uint8List.fromList(encrypted.bytes);
-      return base64.encode(encryptedBytesWithoutSalt).replaceAll('/', 'SiZd8muVgR');
+      return base64
+          .encode(encryptedBytesWithoutSalt)
+          .replaceAll('/', 'SiZd8muVgR');
     } catch (error) {
       rethrow;
     }
@@ -89,13 +100,16 @@ class ApiInterceptor extends Interceptor {
   String decryptAES(String encrypted, String passphrase) {
     try {
       Uint8List encryptedBytesWithSalt = base64.decode(encrypted);
-      Uint8List encryptedBytes = encryptedBytesWithSalt.sublist(16, encryptedBytesWithSalt.length);
+      Uint8List encryptedBytes =
+          encryptedBytesWithSalt.sublist(16, encryptedBytesWithSalt.length);
       final salt = encryptedBytesWithSalt.sublist(8, 16);
       var iVkeys = getIVkeys(passphrase, salt);
       final key = encrypt.Key(iVkeys.item1);
       final iv = encrypt.IV(iVkeys.item2);
-      final encrypter = encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc, padding: "PKCS7"));
-      final decrypted = encrypter.decrypt64(base64.encode(encryptedBytes), iv: iv);
+      final encrypter = encrypt.Encrypter(
+          encrypt.AES(key, mode: encrypt.AESMode.cbc, padding: "PKCS7"));
+      final decrypted =
+          encrypter.decrypt64(base64.encode(encryptedBytes), iv: iv);
       return decrypted;
     } catch (error) {
       rethrow;
@@ -126,7 +140,8 @@ class ApiInterceptor extends Interceptor {
     return Tuple2(keyBtyes, ivBtyes);
   }
 
-  Tuple2<Uint8List, Uint8List> deriveKeyAndIV(String passphrase, Uint8List salt) {
+  Tuple2<Uint8List, Uint8List> deriveKeyAndIV(
+      String passphrase, Uint8List salt) {
     var password = createUint8ListFromString(passphrase);
     Uint8List concatenatedHashes = Uint8List(0);
     Uint8List? currentHash = Uint8List(0);
@@ -142,7 +157,8 @@ class ApiInterceptor extends Interceptor {
       }
 
       currentHash = md5.convert(preHash).bytes as Uint8List?;
-      concatenatedHashes = Uint8List.fromList(concatenatedHashes + currentHash!);
+      concatenatedHashes =
+          Uint8List.fromList(concatenatedHashes + currentHash!);
       if (concatenatedHashes.length >= 48) enoughBytesForKey = true;
     }
 

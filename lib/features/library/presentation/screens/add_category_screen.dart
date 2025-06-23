@@ -20,7 +20,8 @@ class _ImageUploadFormState extends State<ImageUploadForm> {
   String? _base64Image;
 
   Future<void> _pickImage(ImageSource source) async {
-    final pickedFile = await ImagePicker().pickImage(source: source, imageQuality: 85);
+    final pickedFile =
+        await ImagePicker().pickImage(source: source, imageQuality: 85);
     if (pickedFile != null) {
       final file = File(pickedFile.path);
       final bytes = await file.readAsBytes();
@@ -34,13 +35,16 @@ class _ImageUploadFormState extends State<ImageUploadForm> {
   }
 
   void _submit() {
-    if (_formKey.currentState!.validate() && _imageFile != null && _base64Image != null) {
+    if (_formKey.currentState!.validate() &&
+        _imageFile != null &&
+        _base64Image != null) {
       final name = _nameController.text;
       context.read<LibraryBloc>().add(
-        LibraryEvent.createCategory(
-          category: CategoriesCreateRequestModel(name: name, imageUrl: _base64Image ?? ''),
-        ),
-      );
+            LibraryEvent.createCategory(
+              category: CategoriesCreateRequestModel(
+                  name: name, imageUrl: _base64Image ?? ''),
+            ),
+          );
     } else if (_imageFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Пожалуйста, выберите фото.')),
@@ -64,7 +68,9 @@ class _ImageUploadFormState extends State<ImageUploadForm> {
         state.whenOrNull(
           createCategorySuccess: (response) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Категория успешно создана: ${response.name}')),
+              SnackBar(
+                  content:
+                      Text('Категория успешно создана: ${response?.name}')),
             );
             _nameController.clear();
             setState(() {
@@ -98,7 +104,8 @@ class _ImageUploadFormState extends State<ImageUploadForm> {
                 padding: const EdgeInsets.all(20.0),
                 child: Card(
                   elevation: 6,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Form(
@@ -123,17 +130,20 @@ class _ImageUploadFormState extends State<ImageUploadForm> {
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(color: Colors.grey),
                                   ),
-                                  child: const Center(child: Text('Фото не выбрано')),
+                                  child: const Center(
+                                      child: Text('Фото не выбрано')),
                                 ),
                           const SizedBox(height: 20),
                           TextFormField(
                             controller: _nameController,
                             decoration: InputDecoration(
                               labelText: 'Название фото',
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10)),
                             ),
-                            validator: (value) =>
-                                value == null || value.isEmpty ? 'Введите название' : null,
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Введите название'
+                                : null,
                           ),
                           const SizedBox(height: 20),
                           Row(
@@ -147,7 +157,8 @@ class _ImageUploadFormState extends State<ImageUploadForm> {
                               OutlinedButton.icon(
                                 icon: const Icon(Icons.photo),
                                 label: const Text('Галерея'),
-                                onPressed: () => _pickImage(ImageSource.gallery),
+                                onPressed: () =>
+                                    _pickImage(ImageSource.gallery),
                               ),
                             ],
                           ),
@@ -165,11 +176,14 @@ class _ImageUploadFormState extends State<ImageUploadForm> {
                               ),
                               child: isLoading
                                   ? const CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white),
                                     )
                                   : const Text(
                                       'Отправить',
-                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
                                     ),
                             ),
                           ),

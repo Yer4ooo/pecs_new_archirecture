@@ -1,5 +1,5 @@
 
-import 'package:pecs_new_arch/features/login/data/models/login_response_model.dart';
+import 'package:pecs_new_arch/features/start/data/models/login_response_model.dart';
 
 import 'key_value_storage_base.dart';
 
@@ -8,6 +8,7 @@ import 'key_value_storage_base.dart';
 class KeyValueStorageService {
   static const _accessTokenKey = 'accessToken';
   static const _userDataKey = 'userData';
+   static const _userRoleKey = 'userRole';
 
   final _keyValueStorage = KeyValueStorageBase();
 
@@ -18,6 +19,15 @@ class KeyValueStorageService {
   void setAccessToken(String token) {
     _keyValueStorage.setEncrypted(_accessTokenKey, token);
   }
+
+    Future<String?> getUserRole() async {
+    return await _keyValueStorage.getEncrypted(_userRoleKey);
+  }
+
+  void setUserRole(String token) {
+    _keyValueStorage.setEncrypted(_userRoleKey, token);
+  }
+
 
   Future<LoginResponseModel?> getUserData() async {
     String? data = await _keyValueStorage.getEncrypted(_userDataKey);
