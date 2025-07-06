@@ -11,7 +11,8 @@ part 'login_event.dart';
 part 'login_state.dart';
 part 'login_bloc.freezed.dart';
 
-class LoginBloc extends Bloc<LoginEvent, LoginState> with BlocEventHandlerMixin<LoginEvent, LoginState>{
+class LoginBloc extends Bloc<LoginEvent, LoginState>
+    with BlocEventHandlerMixin<LoginEvent, LoginState> {
   final LoginUsecase _loginUsecase = sl();
   LoginBloc() : super(_Initial()) {
     on<LoginEvent>((event, emit) async {

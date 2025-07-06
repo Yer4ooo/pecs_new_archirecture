@@ -1,8 +1,8 @@
 import 'package:pecs_new_arch/core/resources/data_state.dart';
-import 'package:pecs_new_arch/features/registration/data/models/registration_model.dart';
 
-abstract class RegistrationRepository {
-  Future<DataState> register({
-    required RegistrationModel userModel,
-  });
+import '../../data/models/registration_request_model.dart';
+import '../../data/models/registration_success_response_model.dart';
+
+abstract class RegisterRepository {
+  Future<DataState<RegisterResponseModel>> register({required RegisterRequestModel registerUser});
 }

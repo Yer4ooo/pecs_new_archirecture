@@ -3,8 +3,11 @@ import 'package:pecs_new_arch/core/resources/data_state.dart';
 import 'package:pecs_new_arch/features/board/data/datasource/board_api_service.dart';
 import 'package:pecs_new_arch/features/board/data/models/board_create_request_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/board_create_response_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/board_delete_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/board_details_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/board_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/board_update_request_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/board_update_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_request_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tts_play_request_model.dart';
@@ -33,7 +36,7 @@ class BoardRepositoryImpl implements BoardRepository {
   Future<DataState<BoardCreateResponseModel>> createBoard(
       {BoardCreateRequestModel? board, int? id}) async {
     try {
-      var data = await _boardApiService.createBoard(id: id);
+      var data = await _boardApiService.createBoard(board: board, id: id);
       if (data != null) {
         return DataSuccess(data);
       } else {
@@ -80,7 +83,39 @@ class BoardRepositoryImpl implements BoardRepository {
       if (data != null) {
         return DataSuccess(data);
       } else {
-        return DataFailed(CustomException(message: 'GG'));
+        return DataFailed(CustomException(message: ''));
+      }
+    } on CustomException catch (e) {
+      return DataFailed(e);
+    }
+  }
+
+  @override
+  Future<DataState<BoardDeleteResponseModel>> deleteBoard(
+      {int? childId, int? boardId}) async {
+    try {
+      var data = await _boardApiService.deleteBoard(
+          childId: childId, boardId: boardId);
+      if (data != null) {
+        return DataSuccess(data);
+      } else {
+        return DataFailed(CustomException(message: ''));
+      }
+    } on CustomException catch (e) {
+      return DataFailed(e);
+    }
+  }
+
+  @override
+  Future<DataState<BoardUpdateResponseModel>> updateBoard(
+      {int? childId, int? boardId, BoardUpdateRequestModel? board}) async {
+    try {
+      var data = await _boardApiService.updateBoard(
+          childId: childId, boardId: boardId, board: board);
+      if (data != null) {
+        return DataSuccess(data);
+      } else {
+        return DataFailed(CustomException(message: ''));
       }
     } on CustomException catch (e) {
       return DataFailed(e);

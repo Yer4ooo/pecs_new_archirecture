@@ -1,4 +1,3 @@
-
 import 'package:pecs_new_arch/core/network/custom_exceptions.dart';
 import 'package:pecs_new_arch/core/resources/data_state.dart';
 import 'package:pecs_new_arch/features/start/data/datasource/login_datasource.dart';
@@ -10,12 +9,14 @@ class LoginRepositoryImpl implements LoginRepository {
   final LoginApiService _loginApiService;
 
   LoginRepositoryImpl(this._loginApiService);
-  
+
   @override
-  Future<DataState<LoginResponseModel>> login({LoginRequestModel? loginUser}) async {
-       try {
-      LoginResponseModel? data = await _loginApiService.login(loginUser!);
+  Future<DataState<LoginResponseModel>> login(
+      {LoginRequestModel? loginUser}) async {
+    try {
+      var data = await _loginApiService.login(loginUser);
       if (data != null) {
+        print(data);
         return DataSuccess(data);
       } else {
         return DataFailed(CustomException(message: ''));
@@ -24,8 +25,4 @@ class LoginRepositoryImpl implements LoginRepository {
       return DataFailed(e);
     }
   }
-
-
-
-
 }

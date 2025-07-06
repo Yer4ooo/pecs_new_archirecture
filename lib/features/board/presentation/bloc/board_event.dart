@@ -8,4 +8,10 @@ class BoardEvent with _$BoardEvent {
       {BoardCreateRequestModel? board, int? id}) = CreateBoard;
   const factory BoardEvent.createTab({TabCreateRequestModel? tab}) = CreateTab;
   const factory BoardEvent.playTts({TtsPlayRequestModel? tts}) = PlayTts;
+  const factory BoardEvent.deleteBoard({int? childId, int? boardId}) =
+      DeleteBoard;
+  const factory BoardEvent.updateBoard(
+      {int? childId,
+      int? boardId,
+      BoardUpdateRequestModel? board}) = UpdateBoard;
 }

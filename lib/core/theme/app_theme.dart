@@ -9,7 +9,7 @@ import 'package:pecs_new_arch/core/constants/app_colors.dart';
 ThemeData APP_THEME = ThemeData(
   useMaterial3: true,
   scaffoldBackgroundColor: AppColors.white,
-  primaryColor: Color(0xff3A7D44),
+  primaryColor: Color(0xFF3A7D44),
   colorScheme: ColorScheme.fromSeed(seedColor: Color(0xff3A7D44)),
   primaryColorLight: Color(0xFFE7EBFF),
   iconTheme: IconThemeData(color: Colors.black),

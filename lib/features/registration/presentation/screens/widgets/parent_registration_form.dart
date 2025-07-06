@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,9 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pecs_new_arch/core/components/custom_text_field.dart';
 import 'package:pecs_new_arch/core/components/primary_button.dart';
 import 'package:pecs_new_arch/core/constants/app_colors.dart';
-import 'package:pecs_new_arch/features/registration/data/models/registration_model.dart';
 import 'package:pecs_new_arch/features/registration/presentation/bloc/registration_bloc.dart';
 import 'package:pecs_new_arch/features/start/presentation/start_page.dart';
+
+import '../../../../../translations/locale_keys.g.dart';
+import '../../../data/models/registration_request_model.dart';
 
 class ParentRegistrationForm extends StatefulWidget {
   const ParentRegistrationForm({super.key});
@@ -29,46 +32,46 @@ class _ParentRegistrationFormState extends State<ParentRegistrationForm> {
       child: Column(
         children: [
           CustomTextField(
-            label: "Имя", // Email
+            label: LocaleKeys.registration_page_name.tr(), // Email
             keyboardType: TextInputType.emailAddress,
             controller: nameController,
           ),
           15.verticalSpace,
           CustomTextField(
-            label: "Фамилия", // Email
+            label: LocaleKeys.registration_page_surname.tr(), // Email
             keyboardType: TextInputType.emailAddress,
             controller: surnameController,
           ),
           15.verticalSpace,
           CustomTextField(
-            label: "Электронная почта", // Email
+            label: LocaleKeys.registration_page_email.tr(), // Email
             keyboardType: TextInputType.emailAddress,
             controller: emailController,
           ),
           15.verticalSpace,
           CustomTextField(
-            label: "Номер телефона", // Email
+            label: LocaleKeys.registration_page_phone.tr(), // Email
             keyboardType: TextInputType.emailAddress,
             controller: phoneController,
           ),
           15.verticalSpace,
           CustomTextField(
-            label: "Имя пользователя", // Email
-            keyboardType: TextInputType.emailAddress,
+            label: LocaleKeys.registration_page_username.tr(), // Email
+            keyboardType: TextInputType.phone,
             controller: usernameController,
           ),
           15.verticalSpace,
           CustomTextField(
-            label: "Пароль", // Email
-            keyboardType: TextInputType.emailAddress,
+            label: LocaleKeys.registration_page_password.tr(), // Email
+            keyboardType: TextInputType.text,
             controller: passwordController,
           ),
           30.verticalSpace,
           PrimaryButton(
-              text: 'Зарегистрироваться',
+              text: LocaleKeys.registration_page_register.tr(),
               onPressed: () {
-                context.read<RegistrationBloc>().add(RegisterUser(
-              user:   RegistrationModel(
+                context.read<RegisterBloc>().add(Register(
+                    user: RegisterRequestModel(
                 role: 'parent',
                 email: emailController.text,
                 password: passwordController.text,
@@ -82,14 +85,14 @@ class _ParentRegistrationFormState extends State<ParentRegistrationForm> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Нет аккаунта?',
+              Text(LocaleKeys.registration_page_have_acc.tr(),
                   style: GoogleFonts.inter(fontSize: 14.sp, fontWeight: FontWeight.w400, color: Colors.black)),
               TextButton(
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => StartPage()));
                 },
                 child: Text(
-                  'Войти',
+                  LocaleKeys.registration_page_login.tr(),
                   style: GoogleFonts.inter(fontSize: 14.sp, fontWeight: FontWeight.w500, color: AppColors.darkGreen),
                 ),
               ),

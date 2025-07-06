@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +17,7 @@ import 'package:pecs_new_arch/features/board/presentation/bloc/board_bloc.dart';
 import 'package:pecs_new_arch/injection_container.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+@RoutePage()
 class BoardScreen extends StatefulWidget {
   final String boardId;
 
@@ -61,34 +64,9 @@ class _BoardScreenState extends State<BoardScreen> {
     return colorInt;
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent &&
-        !isLoading) {
-      setState(() {
-        isLoading = true;
-        offset += 20;
-      });
-      if (offset + 20 < categoriesCount) {
-        context
-            .read<LibraryBloc>()
-            .add(GetCategories(params: {'limit': 20, 'offset': offset}));
-        setState(() {
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
-
     context
         .read<BoardBloc>()
         .add(GetBoardDetails(id: int.parse(widget.boardId)));
@@ -118,315 +96,245 @@ class _BoardScreenState extends State<BoardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<LibraryBloc>.value(
-          value: context.read<LibraryBloc>(),
-        ),
-        BlocProvider<BoardBloc>.value(
-          value: context.read<BoardBloc>(),
-        ),
-      ],
-      child: BlocListener<BoardBloc, BoardState>(
-        listener: (context, state) {
-          if (state is PlayTtsSuccess) {
-            setState(() {
-              isTTSLoading = false;
-            });
-            _playBytesAsAudio(state.tts);
-          } else if (state is PlayTtsLoading) {
-            setState(() {
-              isTTSLoading = true;
-            });
-          } else if (state is PlayTtsError) {
-            setState(() {
-              isTTSLoading = false;
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error playing audio: ${state.message}'),
-                backgroundColor: Colors.red,
-              ),
+    return BlocListener<BoardBloc, BoardState>(
+      listener: (context, state) {
+        if (state is PlayTtsSuccess) {
+          setState(() {
+            isTTSLoading = false;
+          });
+          _playBytesAsAudio(state.tts);
+        } else if (state is PlayTtsLoading) {
+          setState(() {
+            isTTSLoading = true;
+          });
+        } else if (state is PlayTtsError) {
+          setState(() {
+            isTTSLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error playing audio: ${state.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      child: BlocBuilder<BoardBloc, BoardState>(
+        builder: (context, state) {
+          if (state is BoardDetailsLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is BoardDetailsError) {
+            return const Center(child: Text("Ошибка загрузки доски"));
+          } else if (state is BoardDetailsLoaded ||
+              state is PlayTtsLoading ||
+              state is PlayTtsSuccess ||
+              state is PlayTtsError) {
+            final BoardDetailsModel? boardDetails = state.maybeWhen(
+              boardDetailsLoaded: (boardDetails) => boardDetails,
+              playTtsLoading: (boardDetails) => boardDetails,
+              playTtsSuccess: (boardDetails, _) => boardDetails,
+              playTtsError: (boardDetails, _) => boardDetails,
+              orElse: () => null,
             );
-          }
-        },
-        child: BlocBuilder<BoardBloc, BoardState>(
-          builder: (context, state) {
-            if (state is BoardDetailsLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is BoardDetailsError) {
+            if (boardDetails == null) {
               return const Center(child: Text("Ошибка загрузки доски"));
-            } else if (state is BoardDetailsLoaded ||
-                state is PlayTtsLoading ||
-                state is PlayTtsSuccess ||
-                state is PlayTtsError) {
-              final BoardDetailsModel? boardDetails = state.maybeWhen(
-                boardDetailsLoaded: (boardDetails) => boardDetails,
-                playTtsLoading: (boardDetails) => boardDetails,
-                playTtsSuccess: (boardDetails, _) => boardDetails,
-                playTtsError: (boardDetails, _) => boardDetails,
-                orElse: () => null,
-              );
-
-              if (boardDetails == null) {
-                return const Center(child: Text("Ошибка загрузки доски"));
-              }
-
-              final board = boardDetails.board;
-              final validTabId = curTabId < board.tabs.length ? curTabId : 0;
-              final channel = WebSocketChannel.connect(
-                Uri.parse(
-                    'wss://api.hrilab.qys.kz/ws/tabs/${widget.boardId}/${board.tabs[validTabId].id}/?locale=en'),
-              );
-              return StreamBuilder(
-                  stream: channel.stream,
-                  builder: (context, snapshot) {
-                    String? jsonString;
-                    if (snapshot.data is String) {
-                      jsonString = snapshot.data as String;
-                    } else {
-                      jsonString = snapshot.data.toString();
-                    }
-                    if (!jsonString.trim().startsWith('{') &&
-                        !jsonString.trim().startsWith('[')) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    BoardsTabsResponseModel tabDetails =
-                        boardsTabsResponseModelFromJson(jsonString);
-                    return Scaffold(
-                        resizeToAvoidBottomInset: false,
-                        body: Column(children: [
-                          Expanded(
-                              flex: 8,
-                              child: DragTarget<MapEntry<int, bool>>(
-                                  onAcceptWithDetails: (details) {
-                                setState(() {
-                                  if (details.data.value) {
-                                    _alternativeContainerItems
-                                        .removeAt(details.data.key);
-                                  }
-                                });
-                              }, builder:
-                                      (context, candidateData, rejectedData) {
-                                return Column(
+            }
+            final board = boardDetails.board;
+            final validTabId = curTabId < board.tabs.length ? curTabId : 0;
+            final channel = WebSocketChannel.connect(
+              Uri.parse(
+                  'wss://api.hrilab.qys.kz/ws/tabs/${widget.boardId}/${board.tabs[validTabId].id}/?locale=en'),
+            );
+            return StreamBuilder(
+                stream: channel.stream,
+                builder: (context, snapshot) {
+                  String? jsonString;
+                  if (snapshot.data is String) {
+                    jsonString = snapshot.data as String;
+                  } else {
+                    jsonString = snapshot.data.toString();
+                  }
+                  if (!jsonString.trim().startsWith('{') &&
+                      !jsonString.trim().startsWith('[')) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  BoardsTabsResponseModel tabDetails =
+                      boardsTabsResponseModelFromJson(jsonString);
+                  return Scaffold(
+                    resizeToAvoidBottomInset: false,
+                    body: SafeArea(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: 700.h,
+                              decoration: BoxDecoration(
+                                color:
+                                    Color(hexColor(board.tabs[curTabId].color)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withValues(alpha: 0.5),
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: Offset(
+                                        0, 3), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              child: Stack(children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
                                   children: [
-                                    Expanded(
-                                      flex: 7,
-                                      child: Container(
-                                          color: Color(hexColor(
-                                              board.tabs[curTabId].color)),
-                                          child: Stack(
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: [
-                                                  ...List.generate(
-                                                      board.tabs[curTabId]
-                                                          .strapsNum,
-                                                      (index) => _buildDragTarget(
-                                                          index,
-                                                          tabDetails,
-                                                          board.tabs[curTabId]
-                                                              .id,
-                                                          lightenColor(
-                                                              Color(hexColor(board
-                                                                  .tabs[
-                                                                      curTabId]
-                                                                  .color)),
-                                                              0.5))),
-                                                ],
+                                    ...List.generate(
+                                        board.tabs[curTabId].strapsNum,
+                                        (index) => _buildDragTarget(
+                                            index,
+                                            tabDetails,
+                                            board.tabs[curTabId].id,
+                                            lightenColor(
+                                                Color(hexColor(board
+                                                    .tabs[curTabId].color)),
+                                                0.5))),
+                                  ],
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: IconButton(
+                                          icon: Icon(
+                                              _dragImages
+                                                  ? Icons.lock
+                                                  : Icons.lock_open,
+                                              color: Colors.white,
+                                              size: 30),
+                                          onPressed: () {
+                                            setState(() {
+                                              _dragImages = !_dragImages;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: IconButton(
+                                          icon: Icon(
+                                            Icons.delete_outline_outlined,
+                                            size: 30,
+                                          ),
+                                          color: Colors.white,
+                                          onPressed: () async {
+                                            Map<String, dynamic> message = {
+                                              "type": "update_images",
+                                              "image_positions": []
+                                            };
+                                            String jsonMessage = jsonEncode(
+                                                message,
+                                                toEncodable: (nonEncodable) {
+                                              if (nonEncodable is Set) {
+                                                return nonEncodable.toList();
+                                              }
+                                              throw UnsupportedError(
+                                                  'Cannot encode object of type ${nonEncodable.runtimeType}');
+                                            });
+                                            channel.sink.add(jsonMessage);
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ]),
+                            ),
+                            SizedBox(
+                              height: 80.h,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ...board.tabs.asMap().entries.map((entry) {
+                                    int index = entry.key;
+                                    final tab = entry.value;
+                                    return Row(
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              curTabId = index;
+                                            });
+                                          },
+                                          child: Container(
+                                            height:
+                                                curTabId == index ? 70.h : 60.h,
+                                            width: 188.w,
+                                            decoration: BoxDecoration(
+                                              color: Color(hexColor(tab.color)),
+                                              borderRadius: BorderRadius.only(
+                                                bottomRight:
+                                                    Radius.circular(30.0).r,
+                                                bottomLeft:
+                                                    Radius.circular(30.0).r,
                                               ),
-                                              Positioned(
-                                                right: 0,
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 50,
-                                                      height: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white
-                                                            .withOpacity(0.2),
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      child: IconButton(
-                                                        icon: Icon(
-                                                            _dragImages
-                                                                ? Icons.lock
-                                                                : Icons
-                                                                    .lock_open,
-                                                            color: Colors.white,
-                                                            size: 30),
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            _dragImages =
-                                                                !_dragImages;
-                                                          });
-                                                        },
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 10),
-                                                    Container(
-                                                      width: 50,
-                                                      height: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white
-                                                            .withOpacity(0.2),
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      child: IconButton(
-                                                        icon: Icon(
-                                                          Icons
-                                                              .delete_outline_outlined,
-                                                          size: 30,
-                                                        ),
-                                                        color: Colors.white,
-                                                        onPressed: () async {
-                                                          Map<String, dynamic>
-                                                              message = {
-                                                            "type":
-                                                                "update_images",
-                                                            "image_positions":
-                                                                []
-                                                          };
-                                                          String jsonMessage =
-                                                              jsonEncode(
-                                                                  message,
-                                                                  toEncodable:
-                                                                      (nonEncodable) {
-                                                            if (nonEncodable
-                                                                is Set) {
-                                                              return nonEncodable
-                                                                  .toList();
-                                                            }
-                                                            throw UnsupportedError(
-                                                                'Cannot encode object of type ${nonEncodable.runtimeType}');
-                                                          });
-                                                          channel.sink
-                                                              .add(jsonMessage);
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          )),
-                                    ),
-                                    Expanded(
-                                      flex: 1,
-                                      child: Row(
-                                        children: [
-                                          ...board.tabs
-                                              .asMap()
-                                              .entries
-                                              .map((entry) {
-                                            int index = entry.key;
-                                            final tab = entry.value;
-                                            return Expanded(
-                                              flex: 1,
-                                              child: InkWell(
-                                                onTap: () {
-                                                  setState(() {
-                                                    curTabId = index;
-                                                  });
-                                                },
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 180,
-                                                  decoration: BoxDecoration(
-                                                    color: Color(
-                                                        hexColor(tab.color)),
-                                                    borderRadius:
-                                                        const BorderRadius.only(
-                                                      bottomRight:
-                                                          Radius.circular(16.0),
-                                                      bottomLeft:
-                                                          Radius.circular(16.0),
-                                                    ),
-                                                  ),
-                                                  child: Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      Text(
-                                                        tab.name,
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 16),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                      Align(
-                                                          alignment: Alignment
-                                                              .topRight,
-                                                          child: IconButton(
-                                                            icon: Icon(
-                                                              Icons
-                                                                  .mode_edit_outline_outlined,
-                                                              size: 20,
-                                                            ),
-                                                            color: Colors.white,
-                                                            onPressed: () {
-                                                              setState(() {});
-                                                            },
-                                                          ))
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          }),
-                                          Expanded(
-                                            flex: 1,
-                                            child: Container(
-                                              height: 50,
-                                              width: 180,
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey.shade400,
-                                                borderRadius:
-                                                    const BorderRadius.only(
-                                                  bottomRight:
-                                                      Radius.circular(16.0),
-                                                  bottomLeft:
-                                                      Radius.circular(16.0),
-                                                ),
-                                              ),
-                                              child: Center(
-                                                child: IconButton(
-                                                  onPressed: () {
-                                                    // Navigator.push(
-                                                    //   context,
-                                                    //   MaterialPageRoute(
-                                                    //       builder: (_) =>
-                                                    //           CreateTabScreen(
-                                                    //               boardId: widget
-                                                    //                   .boardId)),
-                                                    // );
-                                                  },
-                                                  icon: const Icon(Icons.add,
-                                                      color: Colors.white),
-                                                ),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                tab.name,
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 16.sp),
+                                                textAlign: TextAlign.center,
                                               ),
                                             ),
                                           ),
-                                        ],
+                                        ),
+                                        7.horizontalSpace,
+                                      ],
+                                    );
+                                  }),
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {});
+                                    },
+                                    child: Container(
+                                      height: 60.h,
+                                      width: 188.w,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius: BorderRadius.only(
+                                          bottomRight: Radius.circular(30.0).r,
+                                          bottomLeft: Radius.circular(30.0).r,
+                                        ),
                                       ),
+                                      child: Center(
+                                          child: Icon(Icons.add,
+                                              color: Colors.white)),
                                     ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                  ],
-                                );
-                              })),
-                          Expanded(
-                              flex: 3,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 200.h,
                               child: _dragImages
                                   ? _buildAlternativeContainer(tabDetails)
                                   : DragTarget<int>(onAcceptWithDetails:
                                       (details) async {
                                       Map<String, dynamic> message = {};
-
                                       message = {
                                         "type": "update_images",
                                         "image_positions": [
@@ -460,16 +368,168 @@ class _BoardScreenState extends State<BoardScreen> {
                                                 name: chosenCategoryName)
                                             : _buildLibraryContainer(),
                                       );
-                                    })),
-                        ]));
-                  });
-            } else {
-              return const SizedBox.shrink();
-            }
-          },
-        ),
+                                    }),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                });
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
       ),
     );
+  }
+
+  Widget _buildDragTarget(
+      int index, BoardsTabsResponseModel tabDetails, int id, Color color) {
+    final images = tabDetails.getImagesByPositionX(index.toDouble());
+    return Builder(builder: (context) {
+      return Expanded(
+          flex: 1,
+          child: Stack(alignment: Alignment.center, children: [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 80.w),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10).r,
+                  color: color,
+                ),
+                width: 10.w,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 80.w),
+              child: Column(
+                children: [
+                  ...List.generate(
+                    4,
+                    (rowIndex) {
+                      return Expanded(
+                        child: DragTarget<int>(
+                            onAcceptWithDetails: (details) async {
+                              Map<String, dynamic> message = {};
+                              bool isDraggingFromSameColumn = false;
+
+                              final draggedImage = tabDetails.images.firstWhere(
+                                    (item) => item.image.id == details.data,
+                              );
+
+                              if (draggedImage != null) {
+                                isDraggingFromSameColumn = draggedImage.positionX == index.toDouble();
+                              }
+                              if (images.length == 4 && !isDraggingFromSameColumn) {
+                                return;
+                              }
+                              List updatedImages = List.from(tabDetails.images)
+                                  .where((item) => item.image.id != details.data)
+                                  .toList();
+                              Map<double, List<Map<String, dynamic>>> columns = {};
+                              for (var item in updatedImages) {
+                                columns.putIfAbsent(item.positionX, () => []);
+                                columns[item.positionX]!.add({
+                                  "image_id": item.image.id,
+                                  "position_x": item.positionX,
+                                  "position_y": item.positionY,
+                                });
+                              }
+                              double targetColumn = index.toDouble();
+                              columns.putIfAbsent(targetColumn, () => []);
+                              List<Map<String, dynamic>> targetItems = columns[targetColumn]!;
+                              targetItems.sort((a, b) => a["position_y"].compareTo(b["position_y"]));
+                              int insertIndex = rowIndex.clamp(0, targetItems.length);
+                              targetItems.insert(insertIndex, {
+                                "image_id": details.data,
+                                "position_x": targetColumn,
+                                "position_y": 0,
+                              });
+                              List<Map<String, dynamic>> imagePositions = [];
+                              for (var entry in columns.entries) {
+                                double colX = entry.key;
+                                List<Map<String, dynamic>> colImages = entry.value;
+
+                                for (int i = 0; i < colImages.length; i++) {
+                                  imagePositions.add({
+                                    "image_id": colImages[i]["image_id"],
+                                    "position_x": colX,
+                                    "position_y": i.toDouble(),
+                                  });
+                                }
+                              }
+                              imagePositions.sort((a, b) {
+                                int cmpX = a["position_x"].compareTo(b["position_x"]);
+                                return cmpX != 0
+                                    ? cmpX
+                                    : a["position_y"].compareTo(b["position_y"]);
+                              });
+                              message = {
+                                "type": "update_images",
+                                "image_positions": imagePositions,
+                              };
+                              String jsonMessage =
+                              jsonEncode(message, toEncodable: (nonEncodable) {
+                            if (nonEncodable is Set) {
+                              return nonEncodable.toList();
+                            }
+                            throw UnsupportedError(
+                                'Cannot encode object of type ${nonEncodable.runtimeType}');
+                          });
+
+                          WebSocket socket = await WebSocket.connect(
+                              'wss://api.hrilab.qys.kz/ws/tabs/${widget.boardId}/$id/?locale=en');
+                          socket.add(jsonMessage);
+                        }, builder: (context, candidateData, rejectedData) {
+                          return Center(
+                              child: images.length >= rowIndex + 1 &&
+                                      images[rowIndex].positionY ==
+                                          rowIndex.toDouble()
+                                  ? _dragImages
+                                      ? Draggable<MapEntry<int, bool>>(
+                                          maxSimultaneousDrags: 1,
+                                          data: MapEntry(
+                                              images[rowIndex].image.id, false),
+                                          feedback: FolderWidget(
+                                            labelText:
+                                                images[rowIndex].image.name,
+                                            imageUrl:
+                                                images[rowIndex].image.imageUrl,
+                                          ),
+                                          child: FolderWidget(
+                                              labelText:
+                                                  images[rowIndex].image.name,
+                                              imageUrl: images[rowIndex]
+                                                  .image
+                                                  .imageUrl),
+                                        )
+                                      : Draggable<int>(
+                                          maxSimultaneousDrags: 1,
+                                          data: images[rowIndex].image.id,
+                                          feedback: FolderWidget(
+                                            labelText:
+                                                images[rowIndex].image.name,
+                                            imageUrl:
+                                                images[rowIndex].image.imageUrl,
+                                          ),
+                                          child: FolderWidget(
+                                              labelText:
+                                                  images[rowIndex].image.name,
+                                              imageUrl: images[rowIndex]
+                                                  .image
+                                                  .imageUrl),
+                                        )
+                                  : SizedBox());
+                        }),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ]));
+    });
   }
 
   Widget _buildExtendedContainer({required int id, required String name}) {
@@ -635,22 +695,20 @@ class _BoardScreenState extends State<BoardScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(
-                width: 10,
-              ),
+              10.horizontalSpace,
               Text(
                 'Library',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Spacer(),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(8.0).r,
                 child: SizedBox(
-                  width: 150,
+                  width: 150.w,
                   child: TextField(
                     controller: searchController,
                     decoration: InputDecoration(
@@ -661,7 +719,7 @@ class _BoardScreenState extends State<BoardScreen> {
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(10).r,
                         borderSide: BorderSide.none,
                       ),
                     ),
@@ -688,15 +746,13 @@ class _BoardScreenState extends State<BoardScreen> {
                   },
                   child: const Icon(Icons.clear, color: Colors.white),
                 ),
-              SizedBox(
-                width: 10,
-              ),
+              10.horizontalSpace,
             ],
           ),
         ),
       ),
       Expanded(
-          flex: 8,
+          flex: 7,
           child: Container(
             color: Color(0xFFFFD8A2),
             child: BlocBuilder<LibraryBloc, LibraryState>(
@@ -710,52 +766,10 @@ class _BoardScreenState extends State<BoardScreen> {
                     ),
                   ],
                 );
-              } else if (state is CategoriesLoading && categories!.isNotEmpty) {
-                return GridView.builder(
-                  key: const PageStorageKey('categoriesGrid'),
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(5),
-                  scrollDirection: Axis.horizontal,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    crossAxisSpacing: 2,
-                    mainAxisSpacing: 2,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: categories!.length + (isLoading ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == categories!.length) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    return GestureDetector(
-                      onTap: () {
-                        onCategoryTap(
-                            categories![index].id, categories![index].name);
-                        searchQuery = '';
-                        searchController.clear();
-                      },
-                      child: CategoryWidget(
-                        labelText: categories![index].name,
-                        imageUrl: categories![index].imageUrl,
-                      ),
-                    );
-                  },
-                );
               } else if (state is CategoriesLoaded) {
-                if (categoriesCount == 0) {
-                  categoriesCount = state.categories!.count;
-                }
-                if (categories!.isEmpty) {
-                  categories = state.categories!.items;
-                } else if (offset + 20 < categoriesCount) {
-                  categories = [...?categories, ...?state.categories?.items];
-                }
+                categories = state.categories!.items;
                 return GridView.builder(
-                  key: const PageStorageKey('categoriesGrid'),
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(5),
+                  padding: EdgeInsets.all(5).r,
                   scrollDirection: Axis.horizontal,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 1,
@@ -974,126 +988,5 @@ class _BoardScreenState extends State<BoardScreen> {
             )),
       ],
     );
-  }
-
-  Widget _buildDragTarget(
-      int index, BoardsTabsResponseModel tabDetails, int id, Color color) {
-    return Builder(builder: (context) {
-      return Expanded(
-        flex: 1,
-        child: DragTarget<int>(
-          onAcceptWithDetails: (details) async {
-            if (!_dragImages) {
-              final RenderBox renderBox =
-                  context.findRenderObject() as RenderBox;
-              final localPosition = renderBox.globalToLocal(details.offset);
-              final Size containerSize = renderBox.size;
-
-              final double relativeX = localPosition.dx / containerSize.width;
-              final double relativeY = localPosition.dy / containerSize.height;
-              if (relativeX >= 0.0 &&
-                  relativeX <= 1.0 &&
-                  relativeY >= 0.0 &&
-                  relativeY <= 1.0) {
-                Map<String, dynamic> message = {};
-                if (tabDetails.images.isEmpty) {
-                  message = {
-                    "type": "update_images",
-                    "image_positions": [
-                      {
-                        "image_id": details.data,
-                        "position_x": index.toDouble(),
-                        "position_y": relativeY,
-                      }
-                    ]
-                  };
-                } else {
-                  message = {
-                    "type": "update_images",
-                    "image_positions": [
-                      ...tabDetails.images
-                          .where((item) => item.image.id != details.data)
-                          .map((item) => {
-                                "image_id": item.image.id,
-                                "position_x": item.positionX,
-                                "position_y": item.positionY,
-                              }),
-                      {
-                        "image_id": details.data,
-                        "position_x": index.toDouble(),
-                        "position_y": relativeY,
-                      }
-                    ]
-                  };
-                }
-
-                String jsonMessage =
-                    jsonEncode(message, toEncodable: (nonEncodable) {
-                  if (nonEncodable is Set) {
-                    return nonEncodable.toList();
-                  }
-                  throw UnsupportedError(
-                      'Cannot encode object of type ${nonEncodable.runtimeType}');
-                });
-
-                WebSocket socket = await WebSocket.connect(
-                    'wss://api.hrilab.qys.kz/ws/tabs/${widget.boardId}/$id/?locale=en');
-                socket.add(jsonMessage);
-              }
-            }
-          },
-          builder: (context, candidateData, rejectedData) {
-            return Padding(
-                padding: const EdgeInsets.only(top: 50, bottom: 50),
-                child: Stack(alignment: Alignment.center, children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: color,
-                    ),
-                    width: 10,
-                  ),
-                  Container(
-                    color: Colors.transparent,
-                    child: Stack(
-                      children: tabDetails.images.map((image) {
-                        if (image.positionX == index) {
-                          double alignmentY = (image.positionY * 2) - 1;
-                          return Align(
-                              alignment: Alignment(0, alignmentY),
-                              child: _dragImages
-                                  ? Draggable<MapEntry<int, bool>>(
-                                      maxSimultaneousDrags: 1,
-                                      data: MapEntry(image.image.id, false),
-                                      feedback: FolderWidget(
-                                        labelText: image.image.name,
-                                        imageUrl: image.image.imageUrl,
-                                      ),
-                                      child: FolderWidget(
-                                          labelText: image.image.name,
-                                          imageUrl: image.image.imageUrl),
-                                    )
-                                  : Draggable<int>(
-                                      maxSimultaneousDrags: 1,
-                                      data: image.image.id,
-                                      feedback: FolderWidget(
-                                        labelText: image.image.name,
-                                        imageUrl: image.image.imageUrl,
-                                      ),
-                                      child: FolderWidget(
-                                          labelText: image.image.name,
-                                          imageUrl: image.image.imageUrl),
-                                    ));
-                        } else {
-                          return const SizedBox.shrink();
-                        }
-                      }).toList(),
-                    ),
-                  )
-                ]));
-          },
-        ),
-      );
-    });
   }
 }

@@ -4,6 +4,4 @@ import 'package:pecs_new_arch/features/start/data/models/login_response_model.da
 
 abstract class LoginRepository {
   Future<DataState<LoginResponseModel>> login({LoginRequestModel? loginUser});
-
- 
 }

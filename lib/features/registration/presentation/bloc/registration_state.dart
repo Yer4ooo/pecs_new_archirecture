@@ -1,11 +1,9 @@
 part of 'registration_bloc.dart';
 
 @freezed
-class RegistrationState with _$RegistrationState {
-  const factory RegistrationState.initial() = _Initial;
-  const factory RegistrationState.registrationLoading() = RegistrationLoading;
-  const factory RegistrationState.registrationFailure(CustomException message) = RegistrationFailure;
-
-  // registration states
-  const factory RegistrationState.registrationSuccess() = RegistrationSuccess;
+class RegisterState with _$RegisterState {
+  const factory RegisterState.initial() = _Initial;
+  const factory RegisterState.registerLoading() = RegisterLoading;
+  const factory RegisterState.registerFailure(CustomException message) = RegisterFailure;
+  const factory RegisterState.registerSuccess(RegisterResponseModel user) = RegisterSuccess;
 }

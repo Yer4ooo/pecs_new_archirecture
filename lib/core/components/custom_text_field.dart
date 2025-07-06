@@ -31,7 +31,6 @@ class CustomTextField extends StatelessWidget {
         ),
         4.verticalSpace,
         TextField(
-          
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,

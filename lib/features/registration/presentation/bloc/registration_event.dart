@@ -1,6 +1,7 @@
 part of 'registration_bloc.dart';
 
+
 @freezed
-class RegistrationEvent with _$RegistrationEvent {
-    const factory RegistrationEvent.registerUser({ RegistrationModel? user}) = RegisterUser;
+class RegisterEvent with _$RegisterEvent {
+  const factory RegisterEvent.register({required RegisterRequestModel user}) = Register;
 }

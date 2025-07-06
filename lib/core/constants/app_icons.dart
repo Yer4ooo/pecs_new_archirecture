@@ -8,6 +8,10 @@ class AppIcons {
   static const String analysis = 'assets/icons/svg/analysis.svg';
   static const String logout = 'assets/icons/svg/logout.svg';
   static const String boards = 'assets/icons/svg/boards.svg';
+  static const String sidebar = 'assets/icons/svg/sidebar.svg';
+  static const String search = 'assets/icons/svg/1.svg';
+  static const String showPassword = 'assets/icons/svg/show_password.svg';
+
 }
 
 List<String> imageTypes = ['jpg', 'jpeg', 'png'];

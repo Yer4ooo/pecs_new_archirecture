@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FolderWidget extends StatelessWidget {
   final String? labelText;
@@ -13,21 +14,21 @@ class FolderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 80,
-      height: 80,
+      width: 150.r,
+      height: 150.r,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
             color: Colors.black26,
-            blurRadius: 8,
+            blurRadius: 8.r,
             offset: Offset(2, 2),
           ),
         ],
       ),
       child: Card(
           color: Colors.white,
-          elevation: 4,
+          elevation: 4.r,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -37,9 +38,9 @@ class FolderWidget extends StatelessWidget {
               Expanded(
                 flex: 7,
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12).r,
+                    topRight: Radius.circular(12).r,
                   ),
                   child: Image.network(
                     imageUrl!,
@@ -48,15 +49,17 @@ class FolderWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              8.verticalSpace,
               Expanded(
                 flex: 3,
-                child: Text(
-                  labelText!,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
+                child: Center(
+                  child: Text(
+                    labelText!,
+                    style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ],
@@ -80,10 +83,10 @@ class CategoryWidget extends StatelessWidget {
     return Stack(
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 10, left: 10),
+          padding: EdgeInsets.only(bottom: 10, left: 10).r,
           child: Card(
               color: Colors.white.withOpacity(0.5),
-              elevation: 4,
+              elevation: 4.r,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -92,7 +95,7 @@ class CategoryWidget extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12).r,
                       child: Container(
                         color: Colors.white,
                       ),
@@ -102,19 +105,19 @@ class CategoryWidget extends StatelessWidget {
               )),
         ),
         Padding(
-          padding: const EdgeInsets.all(5),
+          padding: EdgeInsets.all(5.r),
           child: Card(
               color: Colors.white.withOpacity(0.7),
-              elevation: 4,
+              elevation: 4.r,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12).r,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Expanded(
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12).r,
                       child: Container(
                         color: Colors.white,
                       ),
@@ -124,12 +127,12 @@ class CategoryWidget extends StatelessWidget {
               )),
         ),
         Padding(
-          padding: const EdgeInsets.only(right: 10, top: 10),
+          padding: const EdgeInsets.only(right: 10, top: 10).r,
           child: Card(
               color: Colors.white,
-              elevation: 4,
+              elevation: 4.r,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12).r,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -137,9 +140,9 @@ class CategoryWidget extends StatelessWidget {
                   Expanded(
                     flex: 7,
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(12).r,
+                        topRight: Radius.circular(12).r,
                       ),
                       child: Image.network(
                         imageUrl!,
@@ -148,14 +151,14 @@ class CategoryWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  8.verticalSpace,
                   Expanded(
                     flex: 3,
                     child: Center(
                       child: Text(
                         labelText!,
-                        style: const TextStyle(
-                            fontSize: 12,
+                        style: TextStyle(
+                            fontSize: 12.sp,
                             color: Colors.black,
                             fontWeight: FontWeight.bold),
                       ),

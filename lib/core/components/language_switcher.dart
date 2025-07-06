@@ -25,6 +25,10 @@ class LanguageSwitcher extends StatelessWidget {
               value: Locale('kk'),
               child: Text("ҚАЗ"),
             ),
+            DropdownMenuItem(
+              value: Locale('en'),
+              child: Text("ENG"),
+            ),
           ],
           onChanged: (Locale? newLocale) {
             if (newLocale != null) {

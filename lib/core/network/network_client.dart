@@ -39,6 +39,13 @@ abstract class NetworkClientInterface {
     bool requiresAuthToken = true,
     required T Function(Map<String, dynamic> response) parser,
   });
+  Future<T?> postFormData<T>({
+    required String endpoint,
+    required FormData formData,
+    CancelToken? cancelToken,
+    bool requiresAuthToken,
+    required T Function(Map<String, dynamic> response) parser,
+  });
   Future<T?> deleteData<T>({
     required String endpoint,
     Map<String, dynamic>? body,
@@ -52,6 +59,50 @@ abstract class NetworkClientInterface {
 class NetworkClient implements NetworkClientInterface {
   late final DioService _dioService;
   NetworkClient(DioService dioService) : _dioService = dioService;
+  @override
+  Future<T?> postFormData<T>({
+    required String endpoint,
+    required FormData formData,
+    CancelToken? cancelToken,
+    bool requiresAuthToken = true,
+    required T Function(Map<String, dynamic> response) parser,
+  }) async {
+    Map<String, dynamic> data;
+
+    try {
+      Map<String, dynamic> extra = {
+        'requiresAuthToken': requiresAuthToken,
+      };
+
+      final response = await _dioService.post(
+        endpoint: ApiEndpoint.baseUrl + endpoint,
+        data: formData,
+        options: Options(
+          extra: extra,
+          responseType: ResponseType.json,
+          contentType: 'multipart/form-data',
+        ),
+        cancelToken: cancelToken,
+      );
+
+      if (response.data == null) {
+        throw CustomException(
+          exceptionType: ExceptionType.apiException,
+          message: 'Response data is null',
+        );
+      }
+
+      data = response.data!;
+    } on Exception catch (ex) {
+      throw CustomException.fromDioException(ex);
+    }
+
+    try {
+      return parser(data);
+    } on Exception catch (ex) {
+      throw CustomException.fromParsingException(ex);
+    }
+  }
 
   @override
   Future<T> getData<T>({
@@ -76,7 +127,6 @@ class NetworkClient implements NetworkClientInterface {
         options: Options(extra: extra),
         cancelToken: cancelToken,
       );
-
       if (response.data != null) {
         data = response.data!;
       } else {
@@ -85,6 +135,7 @@ class NetworkClient implements NetworkClientInterface {
         );
       }
     } on Exception catch (ex) {
+      print(ex);
       throw CustomException.fromDioException(ex);
     }
     try {
@@ -261,7 +312,7 @@ class NetworkClient implements NetworkClientInterface {
     try {
       Map<String, dynamic> extra = {};
 
-      final response = await _dioService.put(
+      final response = await _dioService.patch(
         endpoint: ApiEndpoint.baseUrl + endpoint,
         data: body,
         options: Options(extra: extra),

@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:pecs_new_arch/core/utils/service_locator.dart';
+import 'package:pecs_new_arch/features/board/domain/usecases/delete_board_usecase.dart';
+import 'package:pecs_new_arch/features/board/domain/usecases/update_board_usecase.dart';
 import 'package:pecs_new_arch/features/library/data/datasource/library_api_service.dart';
 import 'package:pecs_new_arch/features/library/data/repository/library_repo_impl.dart';
 import 'package:pecs_new_arch/features/library/domain/repository/library_repository.dart';
@@ -33,6 +35,11 @@ import 'package:pecs_new_arch/features/board/domain/usecases/get_board_details_u
 import 'package:pecs_new_arch/features/board/domain/usecases/get_board_usecase.dart';
 import 'package:pecs_new_arch/features/board/domain/usecases/play_tts_usecase.dart';
 import 'package:pecs_new_arch/features/board/presentation/bloc/board_bloc.dart';
+import 'package:pecs_new_arch/features/stickers/data/datasource/stickers_api_service.dart';
+import 'package:pecs_new_arch/features/stickers/data/repository/stickers_repository_impl.dart';
+import 'package:pecs_new_arch/features/stickers/domain/repository/stickers_repository.dart';
+import 'package:pecs_new_arch/features/stickers/domain/usecases/get_stickers_usecase.dart';
+import 'package:pecs_new_arch/features/stickers/presentation/bloc/stickers_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -40,11 +47,11 @@ Future<void> initializeDependencies() async {
   await setupKeyValueStorageService();
   setupApiService();
 
-  sl.registerFactory<RegistrationBloc>(() => RegistrationBloc());
-  sl.registerSingleton<RegistrationApiService>(RegistrationApiService());
-  sl.registerSingleton<RegistrationRepository>(
-      RegistrationRepositoryImpl(sl()));
-  sl.registerSingleton<RegistrationUsecase>(RegistrationUsecase(sl()));
+  sl.registerFactory<RegisterBloc>(() => RegisterBloc());
+  sl.registerSingleton<RegisterApiService>(RegisterApiService());
+  sl.registerSingleton<RegisterRepository>(
+      RegisterRepositoryImpl(sl()));
+  sl.registerSingleton<RegisterUsecase>(RegisterUsecase(sl()));
 
   sl.registerFactory<LoginBloc>(() => LoginBloc());
   sl.registerSingleton<LoginApiService>(LoginApiService());
@@ -70,9 +77,16 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<CreateBoardUsecase>(CreateBoardUsecase(sl()));
   sl.registerSingleton<CreateTabUsecase>(CreateTabUsecase(sl()));
   sl.registerSingleton<PlayTtsUsecase>(PlayTtsUsecase(sl()));
+  sl.registerSingleton<DeleteBoardUsecase>(DeleteBoardUsecase(sl()));
+  sl.registerSingleton<UpdateBoardUsecase>(UpdateBoardUsecase(sl()));
 
   sl.registerFactory<ParentBloc>(() => ParentBloc());
   sl.registerSingleton<ParentApiService>(ParentApiService());
   sl.registerSingleton<ParentRepository>(ParentRepositoryImpl(sl()));
   sl.registerSingleton<GetChildrenListUsecase>(GetChildrenListUsecase(sl()));
+
+  sl.registerFactory<StickersBloc>(() => StickersBloc());
+  sl.registerSingleton<StickersApiService>(StickersApiService());
+  sl.registerSingleton<StickersRepository>(StickersRepositoryImpl(sl()));
+  sl.registerSingleton<GetStickersUsecase>(GetStickersUsecase(sl()));
 }

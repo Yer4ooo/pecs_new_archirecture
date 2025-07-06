@@ -30,4 +30,14 @@ class BoardState with _$BoardState {
       BoardDetailsModel? boardDetails, dynamic tts) = PlayTtsSuccess;
   const factory BoardState.playTtsError(
       BoardDetailsModel? boardDetails, String message) = PlayTtsError;
+
+  const factory BoardState.deleteBoardLoading() = DeleteBoardLoading;
+  const factory BoardState.deleteBoardSuccess(BoardDeleteResponseModel board) =
+      DeleteBoardLoaded;
+  const factory BoardState.deleteBoardError(String message) = DeleteBoardError;
+
+  const factory BoardState.updateBoardLoading() = UpdateBoardLoading;
+  const factory BoardState.updateBoardSuccess(BoardUpdateResponseModel board) =
+      UpdateBoardLoaded;
+  const factory BoardState.updateBoardError(String message) = UpdateBoardError;
 }

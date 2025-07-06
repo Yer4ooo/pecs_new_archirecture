@@ -9,9 +9,11 @@ import 'package:pecs_new_arch/features/registration/presentation/screens/widgets
 import 'package:pecs_new_arch/features/registration/presentation/screens/widgets/parent_registration_form.dart';
 import 'package:pecs_new_arch/features/registration/presentation/screens/widgets/specialist_registration_form.dart';
 import 'package:pecs_new_arch/features/start/presentation/start_page.dart';
-import 'package:pecs_new_arch/features/start/presentation/widgets/logo_part_screen.dart'; // Import Dio
+import 'package:pecs_new_arch/features/start/presentation/widgets/logo_part_screen.dart';
 
-enum UserRole { parent, organization, specialist }
+import '../../../../translations/locale_keys.g.dart'; // Import Dio
+
+enum UserRole { parent, organisation, specialist_solo }
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -78,27 +80,26 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final locale = context.locale;
 
     return BlocProvider(
-      create: (context) => RegistrationBloc(), // Provide the SignUpBloc
+      create: (context) => RegisterBloc(), // Provide the SignUpBloc
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: const Color.fromRGBO(246, 250, 245, 1),
         body: SafeArea(
-          child: BlocConsumer<RegistrationBloc, RegistrationState>(
+          child: BlocConsumer<RegisterBloc, RegisterState>(
             listener: (context, state) {
-              if (state is RegistrationLoading) {
+              if (state is RegisterLoading) {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
                   builder: (context) =>
                       const Center(child: CircularProgressIndicator()),
                 );
-              } else if (state is RegistrationSuccess) {
+              } else if (state is RegisterSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Регистрация прошла успешно!')),
                 );
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const StartPage()));
-              } else if (state is RegistrationFailure) {
+              } else if (state is RegisterFailure) {
                 Navigator.of(context).pop(); // Remove loading dialog
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(state.message.message)),
@@ -106,72 +107,105 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               }
             },
             builder: (context, state) {
-              return Padding(
-                padding: EdgeInsets.only(
-                    left: 25.h, top: 25.w, right: 40.w, bottom: 25.h),
-                child: Row(
+              return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(flex: 2, child: WelcomeLeftPanel()),
-                    Expanded(
-                        flex: 3,
-                        child: SingleChildScrollView(
+                    WelcomeLeftPanel(),
+                    SingleChildScrollView(
+                    child: SizedBox(
+                    width: 0.5.sw,
+                    child: Padding(
+                    padding: const EdgeInsets.all(25).r,
                           child: Column(
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: Colors.grey.shade300),
-                                      borderRadius: BorderRadius.circular(8.r),
-                                    ),
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 12.w, vertical: 6.h),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton<Locale>(
-                                        value: locale,
-                                        icon: const Icon(Icons.arrow_drop_down,
-                                            color: Colors.grey),
-                                        items: [
-                                          DropdownMenuItem(
-                                            value: const Locale('ru'),
-                                            child: Text("РУС",
-                                                style: GoogleFonts.inter(
-                                                    fontSize: 10.sp,
-                                                    color: AppColors.black,
-                                                    fontWeight:
-                                                        FontWeight.w400)),
-                                          ),
-                                          DropdownMenuItem(
-                                            value: const Locale('kk'),
-                                            child: Text("ҚАЗ",
-                                                style: GoogleFonts.inter(
-                                                    fontSize: 10.sp,
-                                                    color: AppColors.black,
-                                                    fontWeight:
-                                                        FontWeight.w400)),
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        border: Border.all(
+                                          color: Colors.grey.shade300,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.05),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
                                           ),
                                         ],
-                                        onChanged: (Locale? newLocale) {
-                                          if (newLocale != null) {
-                                            context.setLocale(newLocale);
-                                          }
-                                        },
+                                      ),
+                                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton<Locale>(
+                                          value: locale,
+                                          isDense: true,
+                                          icon: Icon(
+                                            Icons.keyboard_arrow_down,
+                                            color: Colors.grey.shade600,
+                                            size: 20.sp,
+                                          ),
+                                          iconSize: 20.sp,
+                                          elevation: 8,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14.sp,
+                                            color: AppColors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          dropdownColor: Colors.white,
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          items: [
+                                            DropdownMenuItem(
+                                              value: const Locale('ru'),
+                                              child: Text(
+                                                "РУС",
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 14.sp,
+                                                  color: AppColors.black,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: const Locale('kk'),
+                                              child: Text(
+                                                "ҚАЗ",
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 14.sp,
+                                                  color: AppColors.black,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: const Locale('en'),
+                                              child: Text(
+                                                "ENG",
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 14.sp,
+                                                  color: AppColors.black,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                          onChanged: (Locale? newLocale) {
+                                            if (newLocale != null) {
+                                              context.setLocale(newLocale);
+                                            }
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
                               40.verticalSpace,
                               Padding(
                                 padding:
                                     EdgeInsets.symmetric(horizontal: 101.w),
                                 child: Column(
                                   children: [
-                                    Text("Создать аккаунт",
+                                    Text(LocaleKeys.registration_page_create_acc.tr(),
                                         style: GoogleFonts.inter(
                                             fontSize: 20.sp,
                                             fontWeight: FontWeight.w600,
@@ -190,11 +224,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                       builder: (context) {
                                         switch (selectedRole) {
                                           case UserRole.parent:
-                                            return const ParentRegistrationForm();
-                                          case UserRole.organization:
-                                            return const OrganizationRegistrationForm();
-                                          case UserRole.specialist:
-                                            return const SpecialistRegistrationForm();
+                                            return ParentRegistrationForm();
+                                          case UserRole.organisation:
+                                            return OrganizationRegistrationForm();
+                                          case UserRole.specialist_solo:
+                                            return SpecialistRegistrationForm();
                                         }
                                       },
                                     ),
@@ -204,8 +238,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             ],
                           ),
                         ))
-                  ],
-                ),
+              )],
               );
             },
           ),
@@ -235,9 +268,9 @@ class SegmentedTabBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _buildTab(UserRole.parent, "Родитель", isFirst: true),
-          _buildTab(UserRole.organization, "Организация"),
-          _buildTab(UserRole.specialist, "Специалист", isLast: true),
+          _buildTab(UserRole.parent, LocaleKeys.registration_page_parent.tr(), isFirst: true),
+          _buildTab(UserRole.organisation, LocaleKeys.registration_page_organisation.tr()),
+          _buildTab(UserRole.specialist_solo, LocaleKeys.registration_page_specialist.tr(), isLast: true),
         ],
       ),
     );

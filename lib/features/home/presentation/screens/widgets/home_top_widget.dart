@@ -34,17 +34,11 @@ class _HomeTopWidgetState extends State<HomeTopWidget> {
                 _buildNavItem(context, 'Главная', HomeScreen()),
                 _buildNavItem(context, 'Наша платформа', AboutUs()),
                 _buildNavItem(context, 'О нас', AboutUs()),
-                _buildNavItem(
-                    context,
-                    'Доска',
-                    BoardsScreen(
-                      navigatorKey: navigatorKey,
-                    )),
+                _buildNavItem(context, 'Доска', BoardsScreen()),
                 _buildNavItem(
                     context,
                     'Библиотека',
                     Categories(
-                      navigatorKey: navigatorKey,
                     )),
                 _buildNavItem(context, 'Контакты', AboutUs()),
                 Expanded(

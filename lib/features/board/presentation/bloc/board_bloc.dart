@@ -1,16 +1,21 @@
 import 'package:pecs_new_arch/core/mixin/bloc_operations_mixin.dart';
 import 'package:pecs_new_arch/features/board/data/models/board_create_request_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/board_create_response_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/board_delete_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/board_details_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/board_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/board_update_request_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/board_update_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_request_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tts_play_request_model.dart';
 import 'package:pecs_new_arch/features/board/domain/usecases/create_board_usecase.dart';
 import 'package:pecs_new_arch/features/board/domain/usecases/create_tab_usecase.dart';
+import 'package:pecs_new_arch/features/board/domain/usecases/delete_board_usecase.dart';
 import 'package:pecs_new_arch/features/board/domain/usecases/get_board_details_usecase.dart';
 import 'package:pecs_new_arch/features/board/domain/usecases/get_board_usecase.dart';
 import 'package:pecs_new_arch/features/board/domain/usecases/play_tts_usecase.dart';
+import 'package:pecs_new_arch/features/board/domain/usecases/update_board_usecase.dart';
 import 'package:pecs_new_arch/injection_container.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bloc/bloc.dart';
@@ -27,6 +32,8 @@ class BoardBloc extends Bloc<BoardEvent, BoardState>
     final CreateBoardUsecase _createBoardUsecase = sl();
     final CreateTabUsecase _createTabUsecase = sl();
     final PlayTtsUsecase _playTtsUsecase = sl();
+    final DeleteBoardUsecase _deleteBoardUsecase = sl();
+    final UpdateBoardUsecase _updateBoardUsecase = sl();
 
     on<BoardEvent>((events, emit) async {
       await events.map(
@@ -48,7 +55,12 @@ class BoardBloc extends Bloc<BoardEvent, BoardState>
         ),
         createBoard: (CreateBoard board) async =>
             await handleEvent<BoardCreateResponseModel>(
-          operation: () => _createBoardUsecase.call(params: board.board),
+          operation: () => _createBoardUsecase.call(
+            params: CreateBoardParams(
+              board: board.board,
+              id: board.id,
+            ),
+          ),
           emit: emit,
           onLoading: () => const BoardState.createBoardLoading(),
           onSuccess: (data) async => BoardState.createBoardSuccess(data),
@@ -64,7 +76,6 @@ class BoardBloc extends Bloc<BoardEvent, BoardState>
           onFailure: (error) async => BoardState.createTabError(error.message),
         ),
         playTts: (PlayTts tts) async {
-          // Extract current board details from state
           final currentBoardDetails = state.maybeWhen(
             boardDetailsLoaded: (boardDetails) => boardDetails,
             playTtsLoading: (boardDetails) => boardDetails,
@@ -83,6 +94,32 @@ class BoardBloc extends Bloc<BoardEvent, BoardState>
                 BoardState.playTtsError(currentBoardDetails, error.message),
           );
         },
+        deleteBoard: (DeleteBoard board) async =>
+            await handleEvent<BoardDeleteResponseModel>(
+          operation: () => _deleteBoardUsecase.call(
+            params: DeleteBoardParams(
+                childId: board.childId, boardId: board.boardId),
+          ),
+          emit: emit,
+          onLoading: () => const BoardState.deleteBoardLoading(),
+          onSuccess: (data) async => BoardState.deleteBoardSuccess(data),
+          onFailure: (error) async =>
+              BoardState.deleteBoardError(error.message),
+        ),
+        updateBoard: (UpdateBoard board) async =>
+            await handleEvent<BoardUpdateResponseModel>(
+          operation: () => _updateBoardUsecase.call(
+            params: UpdateBoardParams(
+                childId: board.childId,
+                boardId: board.boardId,
+                board: board.board),
+          ),
+          emit: emit,
+          onLoading: () => const BoardState.updateBoardLoading(),
+          onSuccess: (data) async => BoardState.updateBoardSuccess(data),
+          onFailure: (error) async =>
+              BoardState.updateBoardError(error.message),
+        ),
       );
     });
   }

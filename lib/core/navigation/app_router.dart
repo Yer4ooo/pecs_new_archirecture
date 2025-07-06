@@ -1,33 +1,78 @@
-// import 'package:auto_route/auto_route.dart';
-// import 'package:flutter/material.dart';
-// import 'package:get_it/get_it.dart';
-// import 'package:my_clean_architecture/features/authentication/presentation/bloc/global_auth/global_auth_bloc.dart';
-// import 'package:my_clean_architecture/features/authentication/presentation/page/auth_page.dart';
-// import 'package:my_clean_architecture/features/home/presentation/page/home_page.dart';
-// import 'package:my_clean_architecture/features/home/presentation/page/post_detail.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:chucker_flutter/chucker_flutter.dart';
+import 'package:get_it/get_it.dart';
+import 'package:pecs_new_arch/core/navigation/app_router.gr.dart';
+import 'package:pecs_new_arch/core/utils/key_value_storage_service.dart';
 
-// part 'app_router.gr.dart';
+@AutoRouterConfig()
+class AppRouter extends RootStackRouter {
+  NavigatorObserversBuilder get navigatorObservers =>
+      () => [ChuckerFlutter.navigatorObserver];
 
-// class AuthGuard extends AutoRouteGuard {
-//   @override
-//   void onNavigation(NavigationResolver resolver, StackRouter router) {
-//     final authenticated = GetIt.I<GlobalAuthBloc>().state.status == GlobalAuthStatus.authenticated;
-//     if (authenticated) {
-//       resolver.next(true);
-//     } else {
-//       resolver.next(false);
+  @override
+  RouteType get defaultRouteType => RouteType.material();
 
-//       resolver.redirect(AuthRoute());
-//     }
-//   }
-// }
+  @override
+  List<AutoRoute> get routes => [
+        AutoRoute(
+          page: SidebarWrapper.page,
+          path: '/dashboard',
+          initial: true,
+          guards: [AuthGuard()],
+          children: [
+            AutoRoute(
+              page: ProfileRoute.page,
+              path: 'profile',
+              initial: true,
+            ),
+            // AutoRoute(
+            //   page: ChildrenRoute.page, // You'll need to create this
+            //   path: '/children',
+            // ),
+            AutoRoute(
+              page: BoardsRoute.page,
+              path: 'boards',
+              children: [
+                AutoRoute(
+                  page: BoardsListRoute.page,
+                  path: '',
+                  initial: true,
+                ),
+                AutoRoute(
+                  page: BoardRoute.page,
+                  path: ':boardId',
+                ),
+              ],
+            ),
+            AutoRoute(
+              page: Categories.page, // You'll need to create this
+              path: 'library',
+            ),
+            // AutoRoute(
+            //   page: AnalyticsRoute.page, // You'll need to create this
+            //   path: '/analytics',
+            // ),
+            // AutoRoute(
+            //   page: SettingsRoute.page, // You'll need to create this
+            //   path: '/settings',
+            // ),
+          ],
+        ),
+        AutoRoute(
+          page: StartRoute.page,
+          path: '/start',
+        ),
+      ];
+}
 
-// @AutoRouterConfig(replaceInRouteName: 'Page,Route')
-// class AppRouter extends _$AppRouter {
-//   @override
-//   List<AutoRoute> get routes => [
-//         AutoRoute(page: AuthRoute.page),
-//         AutoRoute(page: HomeRoute.page, initial: true),
-//         AutoRoute(page: PostDetailRoute.page),
-//       ];
-// }
+class AuthGuard extends AutoRouteGuard {
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) async {
+    final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
+    if (token != null) {
+      resolver.next(true);
+    } else {
+      router.push(const StartRoute());
+    }
+  }
+}

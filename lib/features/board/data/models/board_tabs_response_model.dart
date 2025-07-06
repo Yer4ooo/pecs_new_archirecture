@@ -28,7 +28,17 @@ class BoardsTabsResponseModel {
   BoardsTabsResponseModel({
     required this.images,
   });
+  List<ImageElement> getImagesByPositionX(double positionX,
+        {bool ascending = true}) {
+      final filteredImages = images.where((image) => image.positionX == positionX).toList();
 
+      filteredImages.sort((a, b) {
+        final comparison = a.positionY.compareTo(b.positionY);
+        return ascending ? comparison : -comparison;
+      });
+
+      return filteredImages;
+    }
   factory BoardsTabsResponseModel.fromJson(Map<String, dynamic> json) {
     if (json.isEmpty) {
       return BoardsTabsResponseModel(images: []);

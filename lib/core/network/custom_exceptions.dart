@@ -66,11 +66,21 @@ class CustomException implements Exception {
       if (error is DioException) {
         switch (error.type) {
           case DioExceptionType.badResponse:
+          // Fixed: Added null checks for response data
+            String errorMessage = 'The DioException was caused by an incorrect status code as configured by ValidateStatus. ${error.response?.statusCode}';
+
+            if (error.response?.data != null) {
+              // Check if data is a Map and contains message
+              if (error.response!.data is Map<String, dynamic>) {
+                final data = error.response!.data as Map<String, dynamic>;
+                errorMessage = data['message'] ?? errorMessage;
+              }
+            }
+
             return CustomException(
               exceptionType: ExceptionType.badResponseException,
               statusCode: error.response?.statusCode,
-              message: error.response?.data['message'] ??
-                  'The DioException was caused by an incorrect status code as configured by ValidateStatus. ${error.response?.statusCode}',
+              message: errorMessage,
             );
           case DioExceptionType.badCertificate:
             return CustomException(
@@ -83,7 +93,7 @@ class CustomException implements Exception {
               exceptionType: ExceptionType.connectionException,
               statusCode: error.response?.statusCode,
               message:
-                  'Caused for example by a `xhr.onError` or SocketExceptions.',
+              'Caused for example by a `xhr.onError` or SocketExceptions.',
             );
           case DioExceptionType.cancel:
             return CustomException(
@@ -118,16 +128,39 @@ class CustomException implements Exception {
                 message: 'No internet connectivity',
               );
             }
-            if (error.response?.data['headers']['code'] == null) {
+
+            // Fixed: Added null checks for response data access
+            if (error.response?.data == null) {
+              return CustomException(
+                exceptionType: ExceptionType.unrecognizedException,
+                statusCode: error.response?.statusCode,
+                message: error.response?.statusMessage ?? 'Unknown error occurred',
+              );
+            }
+
+            // Check if data is a Map and has the expected structure
+            if (error.response!.data is! Map<String, dynamic>) {
+              return CustomException(
+                exceptionType: ExceptionType.unrecognizedException,
+                statusCode: error.response?.statusCode,
+                message: error.response?.statusMessage ?? 'Unknown error occurred',
+              );
+            }
+
+            final data = error.response!.data as Map<String, dynamic>;
+            final headers = data['headers'] as Map<String, dynamic>?;
+
+            if (headers?['code'] == null) {
               return CustomException(
                 exceptionType: ExceptionType.unrecognizedException,
                 statusCode: error.response?.statusCode,
                 message: error.response?.statusMessage ?? 'Unknown',
               );
             }
-            final name = error.response?.data['headers']['code'] as String;
-            final message =
-                error.response?.data['headers']['message'] as String;
+
+            final name = headers!['code'] as String;
+            final message = headers['message'] as String? ?? 'Unknown error';
+
             if (name == ExceptionType.tokenExpiredException.name) {
               return CustomException(
                 exceptionType: ExceptionType.tokenExpiredException,
