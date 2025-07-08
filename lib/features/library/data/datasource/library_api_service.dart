@@ -1,6 +1,6 @@
 import 'package:pecs_new_arch/core/network/network_client.dart';
 import 'package:pecs_new_arch/features/library/data/models/categories_create_request_model.dart';
-import 'package:pecs_new_arch/features/library/data/models/categories_create_respnse_model.dart';
+import 'package:pecs_new_arch/features/library/data/models/categories_create_response_model.dart';
 import 'package:pecs_new_arch/features/library/data/models/categories_global_model.dart';
 import 'package:pecs_new_arch/features/library/data/models/categories_images_create_request_model.dart';
 import 'package:pecs_new_arch/features/library/data/models/categories_images_create_response_model.dart';
@@ -19,17 +19,19 @@ class LibraryApiService {
           parser: (response) => CategoriesListModel.fromJson(response));
 
   Future<List<CategoriesImagesListModel>?> getCategoryImagesbyId(
-          {required int? id}) =>
-      _networkClient.getData<List<CategoriesImagesListModel>>(
-          endpoint: 'categories/$id/images',
-          parser: (response) =>
-              CategoriesImagesListModel.fromList(response['items']));
+          {required int? id, Map<String, dynamic>? params}) {
+   return _networkClient.getData<List<CategoriesImagesListModel>>(
+       endpoint: 'categories/$id/images',
+       queryParams: params,
+       parser: (response) =>
+           CategoriesImagesListModel.fromList(response['items']));
+  }
 
   Future<CategoriesCreateResponseModel?> createCategory(
-          {CategoriesCreateRequestModel? category}) =>
+          {CategoriesCreateRequestModel? category}) async =>
       _networkClient.postData<CategoriesCreateResponseModel>(
-          endpoint: 'categories',
-          body: category,
+          endpoint: 'categories/',
+          body: await category?.toFormData(),
           parser: (response) =>
               CategoriesCreateResponseModel.fromJson(response));
 

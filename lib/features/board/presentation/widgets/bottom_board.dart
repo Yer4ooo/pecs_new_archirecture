@@ -4,66 +4,85 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class FolderWidget extends StatelessWidget {
   final String? labelText;
   final String? imageUrl;
+  final ValueNotifier<bool>? isOverDeleteZone;
 
-  const FolderWidget({
+  FolderWidget({
     super.key,
     required this.labelText,
     required this.imageUrl,
+    this.isOverDeleteZone,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 150.r,
-      height: 150.r,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 8.r,
-            offset: Offset(2, 2),
+    return ValueListenableBuilder<bool>(
+      valueListenable: isOverDeleteZone ?? ValueNotifier(false),
+      builder: (context, isHovering, _) {
+        return ColorFiltered(
+          colorFilter: ColorFilter.mode(
+            isHovering ? Colors.red.withOpacity(0.6) : Colors.transparent,
+            BlendMode.srcATop, // Changed blend mode
           ),
-        ],
-      ),
-      child: Card(
-          color: Colors.white,
-          elevation: 4.r,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 7,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12).r,
-                    topRight: Radius.circular(12).r,
-                  ),
-                  child: Image.network(
-                    imageUrl!,
-                    fit: BoxFit.contain,
-                    width: double.infinity,
-                  ),
+          child: Container(
+            width: 150.r,
+            height: 150.r,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8.r,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: Card(
+              color: Colors.white,
+              elevation: 4.r,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 7,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(12).r,
+                          topRight: Radius.circular(12).r,
+                        ),
+                        child: Image.network(
+                            imageUrl!,
+                            fit: BoxFit.contain,
+                            width: double.infinity,
+                          ),
+                      ),
+                    ),
+                    8.verticalSpace,
+                    Expanded(
+                      flex: 3,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4.0.r),
+                        child: Text(
+                          labelText ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              8.verticalSpace,
-              Expanded(
-                flex: 3,
-                child: Center(
-                  child: Text(
-                    labelText!,
-                    style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ],
-          )),
+            ),
+        );
+      },
     );
   }
 }
@@ -154,13 +173,18 @@ class CategoryWidget extends StatelessWidget {
                   8.verticalSpace,
                   Expanded(
                     flex: 3,
-                    child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4.0.r),
                       child: Text(
-                        labelText!,
+                        labelText ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontSize: 12.sp,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
+                          fontSize: 12.sp,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),

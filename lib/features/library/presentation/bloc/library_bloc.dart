@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:pecs_new_arch/core/mixin/bloc_operations_mixin.dart';
 import 'package:pecs_new_arch/features/library/data/models/categories_create_request_model.dart';
-import 'package:pecs_new_arch/features/library/data/models/categories_create_respnse_model.dart';
+import 'package:pecs_new_arch/features/library/data/models/categories_create_response_model.dart';
 import 'package:pecs_new_arch/features/library/data/models/categories_global_model.dart';
 import 'package:pecs_new_arch/features/library/data/models/categories_images_create_request_model.dart';
 import 'package:pecs_new_arch/features/library/data/models/categories_images_create_response_model.dart';
@@ -51,7 +51,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState>
         ),
         getCategoryImagesById: (GetCategoryImagesById id) async =>
             await handleEvent<List<CategoriesImagesListModel>?>(
-          operation: () => _getCategoryImagesUsecase.call(params: id.id),
+          operation: () => _getCategoryImagesUsecase.call(params: GetCategoryImagesParams(id: id.id, additionalParams: id.params)),
           emit: emit,
           onLoading: () => const LibraryState.categoryImagesLoading(),
           onSuccess: (data) async => LibraryState.categoryImagesLoaded(data),

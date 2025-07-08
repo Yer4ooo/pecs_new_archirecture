@@ -16,9 +16,9 @@ class WelcomeLeftPanel extends StatelessWidget {
     return SingleChildScrollView(
       child: SizedBox(
         width: 683.w,
-        height: 974.h,
+        height: MediaQuery.sizeOf(context).height,
         child: Padding(
-          padding: EdgeInsets.only(left: 26.r, top: 25.r, bottom: 25.r),
+          padding: EdgeInsets.all(25.r),
             child: Container(
               decoration: BoxDecoration(
                 color: Color(0xFFFEEFA7),

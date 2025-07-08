@@ -41,6 +41,9 @@ import 'package:pecs_new_arch/features/stickers/domain/repository/stickers_repos
 import 'package:pecs_new_arch/features/stickers/domain/usecases/get_stickers_usecase.dart';
 import 'package:pecs_new_arch/features/stickers/presentation/bloc/stickers_bloc.dart';
 
+import 'features/board/domain/usecases/delete_tab_usecase.dart';
+import 'features/board/domain/usecases/update_tab_usecase.dart';
+
 final sl = GetIt.instance;
 
 Future<void> initializeDependencies() async {
@@ -79,6 +82,9 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<PlayTtsUsecase>(PlayTtsUsecase(sl()));
   sl.registerSingleton<DeleteBoardUsecase>(DeleteBoardUsecase(sl()));
   sl.registerSingleton<UpdateBoardUsecase>(UpdateBoardUsecase(sl()));
+  sl.registerSingleton<UpdateTabUsecase>(UpdateTabUsecase(sl()));
+  sl.registerSingleton<DeleteTabUsecase>(DeleteTabUsecase(sl()));
+
 
   sl.registerFactory<ParentBloc>(() => ParentBloc());
   sl.registerSingleton<ParentApiService>(ParentApiService());

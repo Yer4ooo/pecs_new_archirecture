@@ -8,7 +8,11 @@ import 'package:pecs_new_arch/features/board/data/models/board_update_request_mo
 import 'package:pecs_new_arch/features/board/data/models/board_update_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_request_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_response_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/tab_delete_response_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/tab_update_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tts_play_request_model.dart';
+
+import '../../data/models/tab_update_request_model.dart';
 
 abstract class BoardRepository {
   Future<DataState<BoardModel?>> getBoard({int? id});
@@ -22,4 +26,8 @@ abstract class BoardRepository {
       {int? childId, int? boardId});
   Future<DataState<BoardUpdateResponseModel>> updateBoard(
       {int? childId, int? boardId, BoardUpdateRequestModel? board});
+  Future<DataState<TabDeleteResponseModel>> deleteTab(
+      {int? tabId});
+  Future<DataState<TabUpdateResponseModel>> updateTab(
+      {TabUpdateRequestModel? tab});
 }

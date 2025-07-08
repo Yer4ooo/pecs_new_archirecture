@@ -9,7 +9,6 @@ import 'package:pecs_new_arch/core/utils/key_value_storage_service.dart';
 import 'package:sidebarx/sidebarx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-
 import '../../translations/locale_keys.g.dart';
 
 @RoutePage()
@@ -60,7 +59,8 @@ class _SidebarWrapperState extends State<SidebarWrapper> with RouteAware {
       bool shouldHide = false;
 
       if (tabsRouter.activeIndex == 1) {
-        final currentRouter = tabsRouter.innerRouterOf('BoardsRoute') as StackRouter?;
+        final currentRouter =
+            tabsRouter.innerRouterOf('BoardsRoute') as StackRouter?;
         final currentRouteName = currentRouter?.current.name;
         shouldHide = currentRouteName == 'BoardRoute';
       }
@@ -79,7 +79,8 @@ class _SidebarWrapperState extends State<SidebarWrapper> with RouteAware {
       final tabsRouter = AutoTabsRouter.of(context);
       bool shouldHide = false;
       if (tabsRouter.activeIndex == 1) {
-        final currentRouter = tabsRouter.innerRouterOf('BoardsRoute') as StackRouter?;
+        final currentRouter =
+            tabsRouter.innerRouterOf('BoardsRoute') as StackRouter?;
         final currentRouteName = currentRouter?.current.name;
         shouldHide = currentRouteName == 'BoardRoute';
       }
@@ -114,15 +115,20 @@ class _SidebarWrapperState extends State<SidebarWrapper> with RouteAware {
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirm Logout'),
-        content: Text('Are you sure you want to logout?'),
+        title: Text(LocaleKeys.left_nav_confirm_logout.tr()),
+        content: Text(LocaleKeys.left_nav_logout.tr()),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text('Cancel')),
+              child: Text(
+                LocaleKeys.left_nav_cancel.tr(),
+              )),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: Text('Logout')),
+              child: Text(
+                LocaleKeys.left_nav_log_out.tr(),
+                style: TextStyle(color: Colors.red),
+              )),
         ],
       ),
     );
@@ -138,214 +144,235 @@ class _SidebarWrapperState extends State<SidebarWrapper> with RouteAware {
       builder: (context, _) {
         final width = _controller.extended ? 319.0.w : 88.0.w;
         return SizedBox(
-          width: width,
-          child: Material(
-            elevation: _controller.extended ? 12.h : 0.h,
-            child: SidebarX(
-              controller: _controller,
-              showToggleButton: false,
-              headerBuilder: (context, extended) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 88.w,
-                          child: Center(
-                            child: IconButton(
-                              icon: SvgPicture.asset(AppIcons.sidebar),
-                              onPressed: () {
-                                _controller.setExtended(!extended);
-                              },
-                            ),
-                          ),
+            width: width,
+            child: Container(
+              decoration: BoxDecoration(
+                boxShadow: !_controller.extended
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.25),
+                          offset: Offset(2, 0),
+                          blurRadius: 2,
+                          spreadRadius: 2,
                         ),
-                        Expanded(child: SizedBox())
-                      ],
-                    ),
-                    8.verticalSpace,
-                    Row(
+                      ]
+                    : [],
+              ),
+              child: Material(
+                elevation: 0,
+                child: SidebarX(
+                  controller: _controller,
+                  showToggleButton: false,
+                  headerBuilder: (context, extended) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        SizedBox(
-                            width: 88.w,
-                            child:
-                            Center(
-                              child:
-                              CircleAvatar(
-                                radius: 30.r,
-                                child: Image.asset('assets/images/avatar.png'),
-                              ),
-                            )
-                        ),
-                        extended ? Expanded(child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Row(
                           children: [
-                            Text(
-                              userName,
-                              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
+                            SizedBox(
+                              width: 88.w,
+                              child: Center(
+                                child: IconButton(
+                                  icon: SvgPicture.asset(AppIcons.sidebar),
+                                  onPressed: () {
+                                    _controller.setExtended(!extended);
+                                  },
+                                ),
+                              ),
                             ),
-                            Text(
-                              '',
-                              style: TextStyle(
-                                  fontSize: 16.sp, color: Colors.grey),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            Expanded(child: SizedBox())
                           ],
-                        ),):Expanded(child: SizedBox())
+                        ),
+                        8.verticalSpace,
+                        Row(
+                          children: [
+                            SizedBox(
+                                width: 88.w,
+                                child: Center(
+                                  child: CircleAvatar(
+                                    radius: 30.r,
+                                    child:
+                                        Image.asset('assets/images/avatar.png'),
+                                  ),
+                                )),
+                            extended
+                                ? Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          userName,
+                                          style: TextStyle(
+                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.bold),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          '',
+                                          style: TextStyle(
+                                              fontSize: 16.sp,
+                                              color: Colors.grey),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : Expanded(child: SizedBox())
+                          ],
+                        ),
+                        10.verticalSpace,
                       ],
-                    ),
-                    10.verticalSpace,
-                  ],
-                );
-              },
-              theme: SidebarXTheme(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20).r,
-                ),
-                selectedTextStyle: TextStyle(
-                    fontWeight: FontWeight.bold, color: Color(0xFF619451)),
-                itemTextPadding: EdgeInsets.only(left: 30).w,
-                selectedItemTextPadding: EdgeInsets.only(left: 30).w,
-                selectedItemDecoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10).r,
-                  border: Border.all(
-                    color: Color(0xFF619451),
-                  ),
-                ),
-              ),
-              extendedTheme: SidebarXTheme(
-                width: 319.w,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-              ),
-              headerDivider: Divider(
-                color: Colors.black.withOpacity(0.3),
-                height: 1.h,
-                indent: 10.w,
-                endIndent: 10.w,
-              ),
-              items: [
-                SidebarXItem(
-                  iconWidget: SvgPicture.asset(
-                    AppIcons.person,
-                    color: _controller.selectedIndex == 0
-                        ? const Color(0xFF619451)
-                        : Colors.grey.shade600,
-                  ),
-                  label: LocaleKeys.left_nav_profile.tr(),
-                  onTap: () {
-                    AutoTabsRouter.of(context).setActiveIndex(0);
-                    if (_showingSidebarTemporarily) {
-                      _hideTemporarySidebar();
-                    }
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _checkCurrentRoute();
-                    });
+                    );
                   },
-                ),
-                SidebarXItem(
-                  iconWidget: SvgPicture.asset(
-                    AppIcons.people,
-                    color: _controller.selectedIndex == 1
-                        ? const Color(0xFF619451)
-                        : Colors.grey.shade600,
-                  ),
-                  selectable: false,
-                  label: LocaleKeys.left_nav_children.tr(),
-                ),
-                SidebarXItem(
-                    iconWidget: SvgPicture.asset(
-                      AppIcons.boards,
-                      color: _controller.selectedIndex == 2
-                          ? const Color(0xFF619451)
-                          : Colors.grey.shade600,
+                  theme: SidebarXTheme(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20).r,
                     ),
-                    label: LocaleKeys.left_nav_boards.tr(),
-                    onTap: () {
-                      final tabsRouter = AutoTabsRouter.of(context);
-                      if (tabsRouter.activeIndex != 1) {
-                        tabsRouter.setActiveIndex(1);
-                      } else {
-                        final currentRouter = tabsRouter
-                            .innerRouterOf('BoardsRoute') as StackRouter?;
-
-                        final currentRouteName = currentRouter?.current.name;
-
-                        if (currentRouteName == 'BoardRoute') {
-                          currentRouter?.replace(BoardsListRoute());
+                    selectedTextStyle: TextStyle(
+                        fontWeight: FontWeight.bold, color: Color(0xFF619451)),
+                    itemTextPadding: EdgeInsets.only(left: 30).w,
+                    selectedItemTextPadding: EdgeInsets.only(left: 30).w,
+                    selectedItemDecoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10).r,
+                      border: Border.all(
+                        color: Color(0xFF619451),
+                      ),
+                    ),
+                  ),
+                  extendedTheme: SidebarXTheme(
+                    width: 319.w,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                    ),
+                  ),
+                  headerDivider: Divider(
+                    color: Colors.black.withOpacity(0.3),
+                    height: 1.h,
+                    indent: 10.w,
+                    endIndent: 10.w,
+                  ),
+                  items: [
+                    SidebarXItem(
+                      iconWidget: SvgPicture.asset(
+                        AppIcons.person,
+                        color: _controller.selectedIndex == 0
+                            ? const Color(0xFF619451)
+                            : Colors.grey.shade600,
+                      ),
+                      label: LocaleKeys.left_nav_profile.tr(),
+                      onTap: () {
+                        AutoTabsRouter.of(context).setActiveIndex(0);
+                        if (_showingSidebarTemporarily) {
+                          _hideTemporarySidebar();
                         }
-                      }
-                      if (_showingSidebarTemporarily) {
-                        _hideTemporarySidebar();
-                      }
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        _checkCurrentRoute();
-                      });
-                    }),
-                SidebarXItem(
-                  iconWidget: SvgPicture.asset(
-                    AppIcons.book,
-                    color: _controller.selectedIndex == 3
-                        ? const Color(0xFF619451)
-                        : Colors.grey.shade600,
-                  ),
-                  label: LocaleKeys.left_nav_library.tr(),
-                  onTap: () {
-                    AutoTabsRouter.of(context).setActiveIndex(2);
-                    if (_showingSidebarTemporarily) {
-                      _hideTemporarySidebar();
-                    }
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _checkCurrentRoute();
-                    });
-                  },
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _checkCurrentRoute();
+                        });
+                      },
+                    ),
+                    SidebarXItem(
+                      iconWidget: SvgPicture.asset(
+                        AppIcons.people,
+                        color: _controller.selectedIndex == 1
+                            ? const Color(0xFF619451)
+                            : Colors.grey.shade600,
+                      ),
+                      selectable: false,
+                      label: LocaleKeys.left_nav_children.tr(),
+                    ),
+                    SidebarXItem(
+                        iconWidget: SvgPicture.asset(
+                          AppIcons.boards,
+                          color: _controller.selectedIndex == 2
+                              ? const Color(0xFF619451)
+                              : Colors.grey.shade600,
+                        ),
+                        label: LocaleKeys.left_nav_boards.tr(),
+                        onTap: () {
+                          final tabsRouter = AutoTabsRouter.of(context);
+                          if (tabsRouter.activeIndex != 1) {
+                            tabsRouter.setActiveIndex(1);
+                          } else {
+                            final currentRouter = tabsRouter
+                                .innerRouterOf('BoardsRoute') as StackRouter?;
+
+                            final currentRouteName =
+                                currentRouter?.current.name;
+
+                            if (currentRouteName == 'BoardRoute') {
+                              currentRouter?.replace(BoardsListRoute());
+                            }
+                          }
+                          if (_showingSidebarTemporarily) {
+                            _hideTemporarySidebar();
+                          }
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _checkCurrentRoute();
+                          });
+                        }),
+                    SidebarXItem(
+                      iconWidget: SvgPicture.asset(
+                        AppIcons.book,
+                        color: _controller.selectedIndex == 3
+                            ? const Color(0xFF619451)
+                            : Colors.grey.shade600,
+                      ),
+                      label: LocaleKeys.left_nav_library.tr(),
+                      onTap: () {
+                        AutoTabsRouter.of(context).setActiveIndex(2);
+                        if (_showingSidebarTemporarily) {
+                          _hideTemporarySidebar();
+                        }
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _checkCurrentRoute();
+                        });
+                      },
+                    ),
+                    SidebarXItem(
+                      iconWidget: SvgPicture.asset(
+                        AppIcons.analysis,
+                        color: _controller.selectedIndex == 4
+                            ? const Color(0xFF619451)
+                            : Colors.grey.shade600,
+                      ),
+                      label: LocaleKeys.left_nav_analytics.tr(),
+                      selectable: false,
+                    ),
+                    SidebarXItem(
+                      iconWidget: SvgPicture.asset(
+                        AppIcons.settings,
+                        color: _controller.selectedIndex == 5
+                            ? const Color(0xFF619451)
+                            : Colors.grey.shade600,
+                      ),
+                      label: LocaleKeys.left_nav_settings.tr(),
+                      selectable: false,
+                    ),
+                    SidebarXItem(
+                      iconWidget: SvgPicture.asset(
+                        AppIcons.logout,
+                        color: _controller.selectedIndex == 6
+                            ? const Color(0xFF619451)
+                            : Colors.grey.shade600,
+                      ),
+                      label: LocaleKeys.left_nav_log_out.tr(),
+                      onTap: () {
+                        if (_showingSidebarTemporarily) {
+                          _hideTemporarySidebar();
+                        }
+                        _handleLogout();
+                      },
+                    ),
+                  ],
                 ),
-                SidebarXItem(
-                  iconWidget: SvgPicture.asset(
-                    AppIcons.analysis,
-                    color: _controller.selectedIndex == 4
-                        ? const Color(0xFF619451)
-                        : Colors.grey.shade600,
-                  ),
-                  label: LocaleKeys.left_nav_analytics.tr(),
-                  selectable: false,
-                ),
-                SidebarXItem(
-                  iconWidget: SvgPicture.asset(
-                    AppIcons.settings,
-                    color: _controller.selectedIndex == 5
-                        ? const Color(0xFF619451)
-                        : Colors.grey.shade600,
-                  ),
-                  label: LocaleKeys.left_nav_settings.tr(),
-                  selectable: false,
-                ),
-                SidebarXItem(
-                  iconWidget: SvgPicture.asset(
-                    AppIcons.logout,
-                    color: _controller.selectedIndex == 6
-                        ? const Color(0xFF619451)
-                        : Colors.grey.shade600,
-                  ),
-                  label: LocaleKeys.left_nav_log_out.tr(),
-                  onTap: () {
-                    if (_showingSidebarTemporarily) {
-                      _hideTemporarySidebar();
-                    }
-                    _handleLogout();
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
+              ),
+            ));
       },
     );
   }
@@ -413,17 +440,20 @@ class _SidebarWrapperState extends State<SidebarWrapper> with RouteAware {
                       child: Container(color: Colors.black.withOpacity(0.3)),
                     ),
                   ),
-                if (!_shouldHideSidebar || (_shouldHideSidebar && _showingSidebarTemporarily))
+                if (!_shouldHideSidebar ||
+                    (_shouldHideSidebar && _showingSidebarTemporarily))
                   Positioned(
                     top: 0,
                     bottom: 0,
                     left: 0,
                     child: GestureDetector(
-                      onHorizontalDragUpdate: _shouldHideSidebar ? (details) {
-                        if (details.delta.dx < -5) {
-                          _hideTemporarySidebar();
-                        }
-                      } : null,
+                      onHorizontalDragUpdate: _shouldHideSidebar
+                          ? (details) {
+                              if (details.delta.dx < -5) {
+                                _hideTemporarySidebar();
+                              }
+                            }
+                          : null,
                       child: _buildSidebar(),
                     ),
                   ),

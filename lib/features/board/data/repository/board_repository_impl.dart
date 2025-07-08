@@ -10,6 +10,9 @@ import 'package:pecs_new_arch/features/board/data/models/board_update_request_mo
 import 'package:pecs_new_arch/features/board/data/models/board_update_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_request_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_response_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/tab_delete_response_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/tab_update_request_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/tab_update_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tts_play_request_model.dart';
 import 'package:pecs_new_arch/features/board/domain/repository/board_repository.dart';
 
@@ -112,6 +115,34 @@ class BoardRepositoryImpl implements BoardRepository {
     try {
       var data = await _boardApiService.updateBoard(
           childId: childId, boardId: boardId, board: board);
+      if (data != null) {
+        return DataSuccess(data);
+      } else {
+        return DataFailed(CustomException(message: ''));
+      }
+    } on CustomException catch (e) {
+      return DataFailed(e);
+    }
+  }
+
+  @override
+  Future<DataState<TabUpdateResponseModel>> updateTab({TabUpdateRequestModel? tab}) async {
+    try {
+      var data = await _boardApiService.updateTab(tab: tab);
+      if (data != null) {
+        return DataSuccess(data);
+      } else {
+        return DataFailed(CustomException(message: ''));
+      }
+    } on CustomException catch (e) {
+      return DataFailed(e);
+    }
+  }
+
+  @override
+  Future<DataState<TabDeleteResponseModel>> deleteTab({int? tabId}) async {
+    try {
+      var data = await _boardApiService.deleteTab(tabId: tabId);
       if (data != null) {
         return DataSuccess(data);
       } else {

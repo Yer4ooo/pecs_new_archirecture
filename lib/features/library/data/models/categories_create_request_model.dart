@@ -1,28 +1,32 @@
-import 'dart:convert';
-
-CategoriesCreateRequestModel categoriesCreateRequestModelFromJson(String str) =>
-    CategoriesCreateRequestModel.fromJson(json.decode(str));
-
-String categoriesCreateRequestModelToJson(CategoriesCreateRequestModel data) =>
-    json.encode(data.toJson());
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 
 class CategoriesCreateRequestModel {
-  String name;
-  String imageUrl;
+  final String name;
+  final bool public;
+  final File? image;
 
   CategoriesCreateRequestModel({
     required this.name,
-    required this.imageUrl,
+    required this.public,
+    this.image,
   });
 
-  factory CategoriesCreateRequestModel.fromJson(Map<String, dynamic> json) =>
-      CategoriesCreateRequestModel(
-        name: json["name"],
-        imageUrl: json["image_url"],
-      );
+  Future<FormData> toFormData() async {
+    final map = <String, dynamic>{
+      'name': name,
+      'public': public.toString(),
+    };
 
-  Map<String, dynamic> toJson() => {
-        "name": name,
-        "image_url": imageUrl,
-      };
+    if (image != null) {
+      map['image'] = await MultipartFile.fromFile(
+        image!.path,
+        filename: image!.path.split('/').last,
+        contentType: MediaType('image', 'jpeg'),
+      );
+    }
+
+    return FormData.fromMap(map);
+  }
 }

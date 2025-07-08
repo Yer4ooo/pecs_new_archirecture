@@ -8,6 +8,9 @@ import 'package:pecs_new_arch/features/board/data/models/board_update_request_mo
 import 'package:pecs_new_arch/features/board/data/models/board_update_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_request_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_response_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/tab_delete_response_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/tab_update_request_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/tab_update_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tts_play_request_model.dart';
 import 'package:pecs_new_arch/features/board/domain/usecases/create_board_usecase.dart';
 import 'package:pecs_new_arch/features/board/domain/usecases/create_tab_usecase.dart';
@@ -16,12 +19,17 @@ import 'package:pecs_new_arch/features/board/domain/usecases/get_board_details_u
 import 'package:pecs_new_arch/features/board/domain/usecases/get_board_usecase.dart';
 import 'package:pecs_new_arch/features/board/domain/usecases/play_tts_usecase.dart';
 import 'package:pecs_new_arch/features/board/domain/usecases/update_board_usecase.dart';
+import 'package:pecs_new_arch/features/board/domain/usecases/update_tab_usecase.dart';
 import 'package:pecs_new_arch/injection_container.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bloc/bloc.dart';
 
+import '../../domain/usecases/delete_tab_usecase.dart';
+
 part 'board_event.dart';
+
 part 'board_state.dart';
+
 part 'board_bloc.freezed.dart';
 
 class BoardBloc extends Bloc<BoardEvent, BoardState>
@@ -34,6 +42,8 @@ class BoardBloc extends Bloc<BoardEvent, BoardState>
     final PlayTtsUsecase _playTtsUsecase = sl();
     final DeleteBoardUsecase _deleteBoardUsecase = sl();
     final UpdateBoardUsecase _updateBoardUsecase = sl();
+    final UpdateTabUsecase _updateTabUsecase = sl();
+    final DeleteTabUsecase _deleteTabUsecase = sl();
 
     on<BoardEvent>((events, emit) async {
       await events.map(
@@ -119,6 +129,26 @@ class BoardBloc extends Bloc<BoardEvent, BoardState>
           onSuccess: (data) async => BoardState.updateBoardSuccess(data),
           onFailure: (error) async =>
               BoardState.updateBoardError(error.message),
+        ),
+        updateTab: (UpdateTab tab) async =>
+            await handleEvent<TabUpdateResponseModel>(
+          operation: () => _updateTabUsecase.call(
+            params: tab.tab,
+          ),
+          emit: emit,
+          onLoading: () => const BoardState.updateTabLoading(),
+          onSuccess: (data) async => BoardState.updateTabSuccess(data),
+          onFailure: (error) async => BoardState.updateTabError(error.message),
+        ),
+        deleteTab: (DeleteTab value) async =>
+        await handleEvent<TabDeleteResponseModel>(
+          operation: () => _deleteTabUsecase.call(
+            params: value.tabId,
+          ),
+          emit: emit,
+          onLoading: () => const BoardState.deleteTabLoading(),
+          onSuccess: (data) async => BoardState.deleteTabSuccess(data),
+          onFailure: (error) async => BoardState.deleteTabError(error.message),
         ),
       );
     });

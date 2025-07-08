@@ -111,7 +111,17 @@ class ImageImage {
     required this.creatorId,
     required this.creatorName,
   });
-
+  String getLocalizedLabel(String locale) {
+    switch (locale) {
+      case 'kk':
+        return labelKk.isNotEmpty ? labelKk : labelEn;
+      case 'ru':
+        return labelRu.isNotEmpty ? labelRu : labelEn;
+      case 'en':
+      default:
+        return labelEn;
+    }
+  }
   factory ImageImage.fromJson(Map<String, dynamic> json) => ImageImage(
     id: json["id"] ?? 0,
     name: json["name"] ?? "",

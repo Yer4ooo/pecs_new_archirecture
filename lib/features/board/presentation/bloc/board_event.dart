@@ -14,4 +14,7 @@ class BoardEvent with _$BoardEvent {
       {int? childId,
       int? boardId,
       BoardUpdateRequestModel? board}) = UpdateBoard;
+  const factory BoardEvent.updateTab(TabUpdateRequestModel? tab) = UpdateTab;
+  const factory BoardEvent.deleteTab({int? tabId}) =
+  DeleteTab;
 }

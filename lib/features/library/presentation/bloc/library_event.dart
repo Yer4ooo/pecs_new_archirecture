@@ -4,8 +4,7 @@ part of 'library_bloc.dart';
 class LibraryEvent with _$LibraryEvent {
   const factory LibraryEvent.getCategories({Map<String, dynamic>? params}) =
       GetCategories;
-
-  const factory LibraryEvent.getCategoryImagesById({int? id}) =
+  const factory LibraryEvent.getCategoryImagesById({int? id, Map<String, dynamic>? params}) =
       GetCategoryImagesById;
   const factory LibraryEvent.createCategory(
       {CategoriesCreateRequestModel? category}) = CreateCategory;

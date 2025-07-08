@@ -9,8 +9,12 @@ import 'package:pecs_new_arch/features/board/data/models/board_update_request_mo
 import 'package:pecs_new_arch/features/board/data/models/board_update_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_request_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tab_create_response_model.dart';
+import 'package:pecs_new_arch/features/board/data/models/tab_delete_response_model.dart';
 import 'package:pecs_new_arch/features/board/data/models/tts_play_request_model.dart';
 import 'package:pecs_new_arch/injection_container.dart';
+
+import '../models/tab_update_request_model.dart';
+import '../models/tab_update_response_model.dart';
 
 class BoardApiService {
   BoardApiService();
@@ -43,8 +47,9 @@ class BoardApiService {
     return await _networkClient.postTtsDataIsolated(
       endpoint: 'tts/convert',
       body: {
-        "image_ids": tts?.imageIds ?? [],
-        "voice_language": tts?.voiceLanguage,
+        "image_ids": tts!.imageIds ?? [],
+        "voice_language": tts.voiceLanguage,
+        "board_id": tts.boardID,
       },
     );
   }
@@ -64,4 +69,16 @@ class BoardApiService {
         body: board?.toJson(),
         parser: (response) => BoardUpdateResponseModel.fromJson(response));
   }
+  Future<TabUpdateResponseModel?> updateTab(
+      {required TabUpdateRequestModel? tab}) {
+    return _networkClient.updateData<TabUpdateResponseModel>(
+        endpoint: 'boards/tabs/',
+        body: tab?.toJson(),
+        parser: (response) => TabUpdateResponseModel.fromJson(response));
+  }
+  Future<TabDeleteResponseModel?> deleteTab(
+      {required int? tabId}) =>
+      _networkClient.deleteData<TabDeleteResponseModel>(
+          endpoint: 'boards/tabs/?tab_id=$tabId',
+          parser: (response) => TabDeleteResponseModel.fromJson(response));
 }

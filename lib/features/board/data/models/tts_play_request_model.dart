@@ -13,20 +13,22 @@ String ttsPlayRequestModelToJson(TtsPlayRequestModel data) {
 class TtsPlayRequestModel {
   List<int> imageIds;
   String voiceLanguage;
+  int boardID;
 
-  TtsPlayRequestModel({
-    required this.imageIds,
-    required this.voiceLanguage,
-  });
+  TtsPlayRequestModel(
+      {required this.imageIds,
+      required this.voiceLanguage,
+      required this.boardID});
 
   factory TtsPlayRequestModel.fromJson(Map<String, dynamic> json) =>
       TtsPlayRequestModel(
-        imageIds: List<int>.from(json["image_ids"].map((x) => x)),
-        voiceLanguage: json["voice_language"],
-      );
+          imageIds: List<int>.from(json["image_ids"].map((x) => x)),
+          voiceLanguage: json["voice_language"],
+          boardID: json["board_id"]);
 
   Map<String, dynamic> toJson() => {
         "image_ids": List<dynamic>.from(imageIds.map((x) => x)),
         "voice_language": voiceLanguage,
+        "board_id": boardID
       };
 }

@@ -70,13 +70,16 @@ class CustomException implements Exception {
             String errorMessage = 'The DioException was caused by an incorrect status code as configured by ValidateStatus. ${error.response?.statusCode}';
 
             if (error.response?.data != null) {
-              // Check if data is a Map and contains message
               if (error.response!.data is Map<String, dynamic>) {
                 final data = error.response!.data as Map<String, dynamic>;
-                errorMessage = data['message'] ?? errorMessage;
+
+                errorMessage = data['detail'] ??
+                    data['message'] ??
+                    errorMessage;
+              } else if (error.response!.data is String) {
+                errorMessage = error.response!.data;
               }
             }
-
             return CustomException(
               exceptionType: ExceptionType.badResponseException,
               statusCode: error.response?.statusCode,

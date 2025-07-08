@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:get_it/get_it.dart';
+import 'package:path/path.dart';
 import 'package:pecs_new_arch/core/network/api_endpoints.dart';
 import 'package:pecs_new_arch/core/network/custom_exceptions.dart';
 import 'package:pecs_new_arch/core/utils/key_value_storage_service.dart';
@@ -11,6 +12,7 @@ import './dio_service.dart';
 
 abstract class NetworkClientInterface {
   const NetworkClientInterface();
+
   Future<T> getData<T>({
     required String endpoint,
     CancelToken? cancelToken,
@@ -18,6 +20,7 @@ abstract class NetworkClientInterface {
     bool requiresAuthToken = true,
     required T Function(Map<String, dynamic> responseBody) parser,
   });
+
   Future<List<T>> getListData<T>({
     required String endpoint,
     Map<String, dynamic>? queryParams,
@@ -25,6 +28,7 @@ abstract class NetworkClientInterface {
     bool requiresAuthToken = true,
     required List<T> Function(List<dynamic> responseBody) parser,
   });
+
   Future<T?> postData<T>({
     required String endpoint,
     required Map<String, dynamic> body,
@@ -32,6 +36,7 @@ abstract class NetworkClientInterface {
     bool requiresAuthToken = true,
     required T Function(Map<String, dynamic> response) parser,
   });
+
   Future<T?> updateData<T>({
     required String endpoint,
     required Map<String, dynamic> body,
@@ -39,6 +44,7 @@ abstract class NetworkClientInterface {
     bool requiresAuthToken = true,
     required T Function(Map<String, dynamic> response) parser,
   });
+
   Future<T?> postFormData<T>({
     required String endpoint,
     required FormData formData,
@@ -46,6 +52,7 @@ abstract class NetworkClientInterface {
     bool requiresAuthToken,
     required T Function(Map<String, dynamic> response) parser,
   });
+
   Future<T?> deleteData<T>({
     required String endpoint,
     Map<String, dynamic>? body,
@@ -53,12 +60,15 @@ abstract class NetworkClientInterface {
     bool requiresAuthToken = true,
     required T Function(Map<String, dynamic> response)? parser,
   });
+
   void cancelRequests({CancelToken? cancelToken});
 }
 
 class NetworkClient implements NetworkClientInterface {
   late final DioService _dioService;
+
   NetworkClient(DioService dioService) : _dioService = dioService;
+
   @override
   Future<T?> postFormData<T>({
     required String endpoint,
@@ -114,9 +124,13 @@ class NetworkClient implements NetworkClientInterface {
     bool requiresAuthToken = true,
     required T Function(Map<String, dynamic> response) parser,
   }) async {
+    final locale = await GetIt.I<KeyValueStorageService>().getLocale() ?? 'en';
     Map<String, dynamic> data;
     try {
-      Map<String, dynamic> extra = {};
+      Map<String, dynamic> extra = {
+        'requiresAuthToken': requiresAuthToken,
+      };
+
       final response = await _dioService.get<Map<String, dynamic>>(
         endpoint: ApiEndpoint.baseUrl + endpoint,
         queryParams: queryParams,
@@ -124,9 +138,15 @@ class NetworkClient implements NetworkClientInterface {
           policy: cachePolicy,
           maxStale: cacheAgeDays != null ? Duration(days: cacheAgeDays) : null,
         ),
-        options: Options(extra: extra),
+        options: Options(
+          extra: extra,
+          headers: {
+            "Accept-Language": locale,
+          },
+        ),
         cancelToken: cancelToken,
       );
+
       if (response.data != null) {
         data = response.data!;
       } else {
@@ -138,12 +158,14 @@ class NetworkClient implements NetworkClientInterface {
       print(ex);
       throw CustomException.fromDioException(ex);
     }
+
     try {
       return parser(data);
     } on Exception catch (ex) {
       throw CustomException.fromParsingException(ex);
     }
   }
+
 
   @override
   Future<List<T>> getListData<T>({
@@ -156,6 +178,7 @@ class NetworkClient implements NetworkClientInterface {
     bool requiresAuthToken = true,
     required List<T> Function(List<dynamic>) parser,
   }) async {
+    final locale = await GetIt.I<KeyValueStorageService>().getLocale();
     List<dynamic> data;
     try {
       final response = await _dioService.get<List<dynamic>>(
@@ -166,6 +189,7 @@ class NetworkClient implements NetworkClientInterface {
           maxStale: cacheAgeDays != null ? Duration(days: cacheAgeDays) : null,
         ),
         options: Options(
+          headers: {"Accept-Language": locale},
           extra: <String, Object?>{
             'requiresAuthToken': requiresAuthToken,
           },
@@ -199,13 +223,13 @@ class NetworkClient implements NetworkClientInterface {
     try {
       final freshDio = Dio();
       final token = await GetIt.I<KeyValueStorageService>().getAccessToken();
-
       final response = await freshDio.post(
         ApiEndpoint.baseUrl + endpoint,
         data: body,
         options: Options(
           responseType: ResponseType.bytes,
           headers: {
+            "Accept-Language": body["voice_language"],
             "Authorization": "Bearer $token",
             "Content-Type": "application/json",
           },
@@ -235,7 +259,6 @@ class NetworkClient implements NetworkClientInterface {
               errorMessage = errorText;
             }
           }
-          // ignore: empty_catches
         } catch (e) {}
 
         throw Exception(errorMessage);
@@ -244,13 +267,11 @@ class NetworkClient implements NetworkClientInterface {
       if (error is DioException) {
         throw Exception('TTS Network Error: ${error.type} - ${error.message}');
       } else {
-        // Re-throw non-Dio exceptions as-is
         rethrow;
       }
     }
   }
 
-  @override
   Future<T?> postData<T>({
     required String endpoint,
     required dynamic body,
@@ -263,21 +284,22 @@ class NetworkClient implements NetworkClientInterface {
 
     try {
       Map<String, dynamic> extra = {};
+      final isFormData = body is FormData;
+
       final response = await _dioService.post(
         endpoint: (baseurl ?? ApiEndpoint.baseUrl) + endpoint,
         data: body,
         options: Options(
-            extra: extra,
-            responseType: ResponseType.json,
-            contentType: 'application/json'),
+          extra: extra,
+          responseType: ResponseType.json,
+          contentType: isFormData ? 'multipart/form-data' : 'application/json',
+        ),
         cancelToken: cancelToken,
       );
 
       if (parser == null) {
-        // если парсер НЕ передан и запрос прошел успешно, то возвращаем null
         return null;
       } else if (response.data == null) {
-        // если парсер передан и запрос прошел успешно, но данные не пришли, то кидаем CustomException
         throw CustomException(
           exceptionType: ExceptionType.apiException,
           message: 'Response data is null',
@@ -288,6 +310,7 @@ class NetworkClient implements NetworkClientInterface {
     } on Exception catch (ex) {
       throw CustomException.fromDioException(ex);
     }
+
     try {
       return parser(data);
     } catch (ex) {

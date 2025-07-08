@@ -10,8 +10,10 @@ String categoriesImagesListModelToJson(List<CategoriesImagesListModel> data) =>
 class CategoriesImagesListModel {
   int? id;
   String? name;
+  String? label_en;
+  String? label_ru;
+  String? label_kk;
   String? imageUrl;
-  int? folder;
   bool? public;
   int? creatorId;
   String? creatorName;
@@ -20,33 +22,49 @@ class CategoriesImagesListModel {
     this.id,
     this.name,
     this.imageUrl,
-    this.folder,
     this.public,
     this.creatorId,
     this.creatorName,
+    this.label_en,
+    this.label_ru,
+    this.label_kk,
   });
 
   factory CategoriesImagesListModel.fromJson(Map<String, dynamic> json) =>
       CategoriesImagesListModel(
         id: json["id"],
         name: json["name"],
+        label_en: json["label_en"],
+        label_ru: json["label_ru"],
+        label_kk: json["label_kk"],
         imageUrl: json["imageUrl"],
-        folder: json["folder"],
         public: json["public"],
         creatorId: json["creator_id"],
         creatorName: json["creator_name"],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "imageUrl": imageUrl,
-        "folder": folder,
-        "public": public,
-        "creator_id": creatorId,
-        "creator_name": creatorName,
-      };
-
+    "id": id,
+    "name": name,
+    "label_en": label_en,
+    "label_ru": label_ru,
+    "label_kk": label_kk,
+    "imageUrl": imageUrl,
+    "public": public,
+    "creator_id": creatorId,
+    "creator_name": creatorName,
+  };
+  String getLocalizedName(String locale) {
+    switch (locale) {
+      case 'kk':
+        return label_kk?.isNotEmpty == true ? label_kk! : label_en ?? name ?? '';
+      case 'ru':
+        return label_ru?.isNotEmpty == true ? label_ru! : label_en ?? name ?? '';
+      case 'en':
+      default:
+        return label_en ?? name ?? '';
+    }
+  }
   static List<CategoriesImagesListModel> fromList(List? list) {
     if (list == null) return [];
     return list.map((e) => CategoriesImagesListModel.fromJson(e)).toList();

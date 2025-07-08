@@ -16,7 +16,6 @@ class LoginRepositoryImpl implements LoginRepository {
     try {
       var data = await _loginApiService.login(loginUser);
       if (data != null) {
-        print(data);
         return DataSuccess(data);
       } else {
         return DataFailed(CustomException(message: ''));

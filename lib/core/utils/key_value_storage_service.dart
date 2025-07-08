@@ -9,9 +9,16 @@ class KeyValueStorageService {
   static const _accessTokenKey = 'accessToken';
   static const _userDataKey = 'userData';
    static const _userRoleKey = 'userRole';
+  static const _localeKey = 'userLocale';
 
   final _keyValueStorage = KeyValueStorageBase();
+  Future<String?> getLocale() async {
+    return await _keyValueStorage.getEncrypted(_localeKey);
+  }
 
+  void setLocale(String locale) {
+    _keyValueStorage.setEncrypted(_localeKey, locale);
+  }
   Future<String?> getAccessToken() async {
     return await _keyValueStorage.getEncrypted(_accessTokenKey);
   }

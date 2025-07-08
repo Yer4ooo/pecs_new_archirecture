@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pecs_new_arch/core/constants/app_colors.dart';
 import 'package:pecs_new_arch/core/navigation/app_router.gr.dart';
@@ -15,6 +16,7 @@ import 'package:pecs_new_arch/features/parent/presentation/bloc/parent_bloc.dart
 import 'package:pecs_new_arch/features/stickers/data/models/sticker_model.dart';
 import 'package:pecs_new_arch/features/stickers/presentation/bloc/stickers_bloc.dart';
 
+import '../../../../core/utils/key_value_storage_service.dart';
 import '../../../../translations/locale_keys.g.dart';
 
 @RoutePage()
@@ -43,7 +45,7 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
   String selectedChildName = '';
   String selectedChildSurname = '';
   String? selectedChildId;
-  Color selectedColor = Color(0xFF4CAF50);
+  Color selectedColor = Color(0xFF619451);
 
   final List<Color> colors = [
     Color(0xFF619451),
@@ -71,6 +73,7 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
   void _showEditDialog(BuildContext context, Board board) {
     context.read<StickersBloc>().add(StickersEvent.getStickers());
     final TextEditingController textController = TextEditingController();
+    textController.text = board.name;
     List<(int, String, String)> stickersOnBoard =
         List.generate(3, (index) => (-1, '', ''));
     for (StickerElement element in board.stickers) {
@@ -95,11 +98,11 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
             return Dialog(
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10).r,
               ),
               child: SingleChildScrollView(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
+                  constraints: BoxConstraints(maxWidth: 600),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -529,6 +532,9 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       SizedBox(
+                                        height: 5,
+                                      ),
+                                      SizedBox(
                                         height: 60,
                                         child: ListView.builder(
                                           scrollDirection: Axis.horizontal,
@@ -594,7 +600,7 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(10)),
-                                                    height: 200,
+                                                    height: 195,
                                                     child: BlocBuilder<
                                                         StickersBloc,
                                                         StickersState>(
@@ -699,9 +705,12 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: Text('Confirm Delete'),
-                                          content: Text(
-                                              'Are you sure you want to delete this board?'),
+                                          title: Text(LocaleKeys
+                                              .boards_confirm_delete
+                                              .tr()),
+                                          content: Text(LocaleKeys
+                                              .boards_delete_board
+                                              .tr()),
                                           actions: [
                                             TextButton(
                                               onPressed: () =>
@@ -717,7 +726,9 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
                                                       .pop(true),
                                               style: TextButton.styleFrom(
                                                   foregroundColor: Colors.red),
-                                              child: Text('Delete'),
+                                              child: Text(LocaleKeys
+                                                  .boards_delete
+                                                  .tr()),
                                             ),
                                           ],
                                         );
@@ -1290,6 +1301,9 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       SizedBox(
+                                        height: 5,
+                                      ),
+                                      SizedBox(
                                         height: 60,
                                         child: ListView.builder(
                                           scrollDirection: Axis.horizontal,
@@ -1355,7 +1369,7 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(10)),
-                                                    height: 200,
+                                                    height: 195,
                                                     child: BlocBuilder<
                                                         StickersBloc,
                                                         StickersState>(
@@ -1764,18 +1778,18 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
                             crossAxisCount: 5,
                             crossAxisSpacing: 45.w,
                             mainAxisSpacing: 45.h,
-                            childAspectRatio: 3.h / 5.h,
+                            childAspectRatio: 3 / 4,
                           ),
                           itemBuilder: (context, index) {
                             if (index == 0) {
-                              return GestureDetector(
-                                onTap: () {
-                                  _showCreateDialog(context);
-                                },
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      flex: 8,
+                              return Column(
+                                children: [
+                                  Expanded(
+                                    flex: 9,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _showCreateDialog(context);
+                                      },
                                       child: Container(
                                         decoration: BoxDecoration(
                                           color: Color(0xFFE3E3E3),
@@ -1800,16 +1814,16 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
                                         )),
                                       ),
                                     ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Text(LocaleKeys.boards_create.tr(),
-                                          style: TextStyle(
-                                            fontSize: 18.sp,
-                                            fontWeight: FontWeight.bold,
-                                          )),
-                                    )
-                                  ],
-                                ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(LocaleKeys.boards_create.tr(),
+                                        style: TextStyle(
+                                          fontSize: 18.sp,
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                  )
+                                ],
                               );
                             } else {
                               final boardIndex = index - 1;
@@ -1820,7 +1834,7 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
                                     MainAxisAlignment.spaceAround,
                                 children: [
                                   Expanded(
-                                    flex: 8,
+                                    flex: 9,
                                     child: GestureDetector(
                                       onTap: () {
                                         context.router.popAndPush(
@@ -2017,7 +2031,7 @@ class _BoardsListScreenState extends State<BoardsListScreen> {
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 2,
+                                    flex: 1,
                                     child: Text(
                                       board.name,
                                       overflow: TextOverflow.ellipsis,

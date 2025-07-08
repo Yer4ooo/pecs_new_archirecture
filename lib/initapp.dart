@@ -29,6 +29,7 @@ Future<void> initApp() async {
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   final appRouter = AppRouter();
 
   runApp(

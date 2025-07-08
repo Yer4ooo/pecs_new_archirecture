@@ -1,3 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
+
 class CategoriesGlobalModel {
   final int count;
   final String? next;
@@ -32,7 +35,6 @@ class CategoriesGlobalModel {
   }
 }
 
-// Change BaseItem to sealed class
 sealed class BaseItem {
   final int id;
   final String name;
@@ -197,4 +199,22 @@ extension CategoriesResponseExtension on CategoriesGlobalModel {
 
   bool get hasNextPage => next != null;
   bool get hasPrevPage => prev != null;
+}
+extension BaseItemLocalizedName on BaseItem {
+  String getLocalizedName(BuildContext context) {
+    final locale = context.locale.languageCode;
+
+    return switch (this) {
+      CategoryItem category => switch (locale) {
+        'kk' => category.nameKk.isNotEmpty ? category.nameKk : category.nameEn,
+        'ru' => category.nameRu.isNotEmpty ? category.nameRu : category.nameEn,
+        _    => category.nameEn,
+      },
+      ImageItem image => switch (locale) {
+        'kk' => image.labelKk.isNotEmpty ? image.labelKk : image.labelEn,
+        'ru' => image.labelRu.isNotEmpty ? image.labelRu : image.labelEn,
+        _    => image.labelEn,
+      },
+    };
+  }
 }
